@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>旅游列车排座</title>
+  <link rel="stylesheet" href="/static/style.css?v=20260805" />
+</head>
+<body>
+  <main class="container">
+    <h1>旅游列车排座</h1>
+
+    <!-- ① 排座 -->
+    <section class="panel step">
+      <h2>① 排座</h2>
+      <form id="seat-form">
+        <label>
+          游客信息表（演出票系统订单明细）
+          <input type="file" name="file" accept=".xlsx,.xls,.csv" required />
+        </label>
+        <label>
+          订单维度表（可选，含下单人/手机号）
+          <input type="file" name="orders" accept=".xlsx,.xls,.csv" />
+        </label>
+        <label>
+          列车
+          <select name="train" required>
+            <option value="">请选择列车</option>
+          </select>
+        </label>
+        <label>
+          游玩日期
+          <input type="date" name="date" required />
+        </label>
+        <button type="submit" class="btn" id="submit-btn">开始排座</button>
+        <p id="error" class="error hidden"></p>
+      </form>
+
+      <section id="progress" class="hidden" aria-live="polite">
+        <h3>排座进度</h3>
+        <div class="progress-track">
+          <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+        </div>
+        <p id="progress-stage" class="stage">准备中…</p>
+      </section>
+
+      <section id="summary" class="hidden" aria-live="polite">
+        <h3>排座结果</h3>
+        <div id="summary-meta" class="meta"></div>
+        <table id="summary-table"></table>
+        <a id="download-btn" class="btn disabled" href="#" download aria-disabled="true">下载排座总表</a>
+        <p class="hint hidden" id="sms-ready-hint">排座完成，可在下方 ② 生成短信清单。</p>
+      </section>
+    </section>
+
+    <!-- ② 短信梳理 -->
+    <section class="panel step">
+      <h2>② 短信梳理</h2>
+      <p class="hint">基于最近一次排座结果生成短信清单（联系人信息已随排座阶段获取，无需再次上传订单表）。</p>
+      <form id="sms-form">
+        <button type="submit" class="btn" id="sms-submit-btn">生成短信清单</button>
+        <p id="sms-error" class="error hidden"></p>
+      </form>
+
+      <section id="sms-progress" class="hidden" aria-live="polite">
+        <h3>短信梳理进度</h3>
+        <div class="progress-track">
+          <div id="sms-progress-bar" class="progress-bar" style="width: 0%"></div>
+        </div>
+        <p id="sms-progress-stage" class="stage">准备中…</p>
+      </section>
+
+      <section id="sms-summary" class="hidden" aria-live="polite">
+        <h3>短信清单</h3>
+        <div id="sms-meta" class="meta"></div>
+        <a id="sms-download-btn" class="btn disabled" href="#" download aria-disabled="true">下载短信内容</a>
+        <a id="sms-detail-download-btn" class="btn disabled" href="#" download aria-disabled="true">下载短信明细</a>
+        <a id="sms-manifest-download-btn" class="btn disabled" href="#" download aria-disabled="true">下载发送清单</a>
+      </section>
+    </section>
+
+    <p class="hint">提示：请只上传一辆车的订单数据；先选列车再选游玩日期，日期决定当日开行的交路与站间段。</p>
+    <p class="hint" id="origin-info"></p>
+  </main>
+
+  <!-- 弹窗（提示 / 人工确认） -->
+  <div id="modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <h3 id="modal-title"></h3>
+      <p id="modal-message"></p>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn secondary hidden">取消</button>
+        <button id="modal-ok" class="btn hidden">知道了</button>
+        <button id="modal-confirm" class="btn hidden">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/config.js?v=20260805"></script>
+  <script src="/static/app.js?v=20260805"></script>
+</body>
+</html>
