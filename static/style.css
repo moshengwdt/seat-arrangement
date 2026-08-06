@@ -476,6 +476,18 @@ form input[type="file"]::file-selector-button {
 }
 .date-cell.empty { pointer-events: none; }
 
+/* 下拉/日期弹层：适度透光 + 背景模糊，保持玻璃感而非实心面板 */
+.train-popup,
+.date-popup {
+  background: linear-gradient(150deg, rgba(40, 45, 62, 0.78), rgba(28, 32, 46, 0.7));
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+:root[data-theme="light"] .train-popup,
+:root[data-theme="light"] .date-popup {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.46));
+}
+
 /* ---------- 移动端自适应 ---------- */
 @media (max-width: 560px) {
   .container { padding: 30px 14px 52px; }
