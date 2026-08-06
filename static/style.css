@@ -63,7 +63,7 @@ body::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(620px circle at 50% 30%, rgba(255, 255, 255, 0.07), transparent 65%);
+  background: radial-gradient(480px circle at 50% 30%, rgba(255, 255, 255, 0.04), transparent 65%);
 }
 
 .container {
@@ -197,33 +197,38 @@ form input[type="file"]::file-selector-button {
   border-radius: 10px;
   padding: 7px 14px;
   margin-right: 10px;
-  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
 }
 
-/* ---------- 玻璃按钮（亮玻璃配深色文字，暗底上更突出） ---------- */
+/* ---------- 玻璃按钮（与面板同款清透玻璃） ---------- */
 .btn {
   display: inline-block;
   margin-top: 4px;
   padding: 11px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 15px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.7));
-  color: #1c1f26;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22), inset 0 1px 0 #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.16);
   transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s;
 }
-.btn:hover { transform: translateY(-1px); box-shadow: 0 7px 18px rgba(0, 0, 0, 0.28); }
+.btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
 .btn:active { transform: scale(0.97); }
 .btn:disabled { opacity: 0.5; cursor: wait; }
 .btn.disabled { opacity: 0.35; pointer-events: none; cursor: not-allowed; }
-.btn.secondary { background: rgba(255, 255, 255, 0.14); color: var(--text); border-color: rgba(255, 255, 255, 0.28); }
+.btn.secondary { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.18); }
 
 /* ---------- 进度条 ---------- */
 .progress-track {
