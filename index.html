@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>观光列车智能排座助手</title>
-  <link rel="stylesheet" href="static/style.css?v=20260812" />
+  <link rel="stylesheet" href="static/style.css?v=20260813" />
 </head>
 <body>
   <div id="liquid-sheen"></div>
@@ -31,7 +31,16 @@
         </label>
         <label>
           游玩日期
-          <input type="date" name="date" required />
+          <div class="date-wrap">
+            <input type="date" name="date" required />
+            <button type="button" class="date-cal-btn" id="date-cal-btn" aria-label="选择日期">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="16" rx="3" />
+                <path d="M3 10h18M8 3v4M16 3v4" />
+              </svg>
+            </button>
+          </div>
         </label>
         <button type="submit" class="btn" id="submit-btn">开始排座</button>
         <p id="error" class="error hidden"></p>
@@ -97,7 +106,7 @@
     </div>
   </div>
 
-  <script src="static/config.js?v=20260812"></script>
-  <script src="static/app.js?v=20260812"></script>
+  <script src="static/config.js?v=20260813"></script>
+  <script src="static/app.js?v=20260813"></script>
 </body>
 </html>

@@ -293,6 +293,89 @@ const sheen = document.getElementById("liquid-sheen");
 if (sheen) {
   document.addEventListener("pointermove", (e) => {
     sheen.style.background =
-      `radial-gradient(620px circle at ${e.clientX}px ${e.clientY}px, rgba(255,255,255,0.32), transparent 65%)`;
+      `radial-gradient(480px circle at ${e.clientX}px ${e.clientY}px, rgba(255,255,255,0.04), transparent 65%)`;
   });
 }
+
+// ---------- 玻璃日期选择器（替换原生日历弹窗） ----------
+function initGlassDatePicker(input) {
+  if (!input) return;
+  const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
+  const popup = document.createElement("div");
+  popup.className = "date-popup hidden";
+  document.body.appendChild(popup);
+  let view = null;
+
+  function todayIso() {
+    const n = new Date();
+    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+  }
+
+  function render() {
+    const y = view.y, m = view.m;
+    const startDow = new Date(y, m, 1).getDay();
+    const days = new Date(y, m + 1, 0).getDate();
+    let html =
+      `<div class="date-popup-head">` +
+      `<button type="button" class="date-nav" data-nav="-1">‹</button>` +
+      `<span class="date-title">${y} 年 ${m + 1} 月</span>` +
+      `<button type="button" class="date-nav" data-nav="1">›</button></div>` +
+      `<div class="date-week">${WEEK.map((w) => `<span>${w}</span>`).join("")}</div>` +
+      `<div class="date-grid">`;
+    for (let i = 0; i < startDow; i++) html += `<span class="date-cell empty"></span>`;
+    for (let d = 1; d <= days; d++) {
+      const iso = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      const cls = ["date-cell", iso === input.value ? "selected" : "", iso === todayIso() ? "today" : ""]
+        .filter(Boolean).join(" ");
+      html += `<button type="button" class="${cls}" data-date="${iso}">${d}</button>`;
+    }
+    html += `</div>`;
+    popup.innerHTML = html;
+  }
+
+  function open() {
+    const now = input.value ? new Date(input.value + "T00:00:00") : new Date();
+    view = { y: now.getFullYear(), m: now.getMonth() };
+    render();
+    const r = input.getBoundingClientRect();
+    popup.style.left = Math.min(r.left, window.innerWidth - 320) + "px";
+    popup.style.top = (r.bottom + 8) + "px";
+    popup.classList.remove("hidden");
+  }
+  function close() { popup.classList.add("hidden"); }
+
+  popup.addEventListener("click", (e) => {
+    const nav = e.target.closest("[data-nav]");
+    if (nav) {
+      view.m += Number(nav.dataset.nav);
+      if (view.m < 0) { view.m = 11; view.y--; }
+      if (view.m > 11) { view.m = 0; view.y++; }
+      render();
+      return;
+    }
+    const cell = e.target.closest("[data-date]");
+    if (cell) {
+      input.value = cell.dataset.date;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      close();
+    }
+  });
+
+  input.addEventListener("click", open);
+  input.addEventListener("focus", open);
+  const btn = document.getElementById("date-cal-btn");
+  if (btn) {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (popup.classList.contains("hidden")) open(); else close();
+    });
+  }
+  document.addEventListener("click", (e) => {
+    if (!popup.contains(e.target) && e.target !== input && !e.target.closest(".date-cal-btn")) close();
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  window.addEventListener("resize", close);
+}
+
+initGlassDatePicker(document.querySelector('input[type="date"][name="date"]'));
