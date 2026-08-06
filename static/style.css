@@ -1,14 +1,14 @@
-/* ============ iOS 26 液态玻璃主题 ============ */
+/* ============ 清透玻璃主题（柔和莫兰迪配色） ============ */
 :root {
-  --accent: #0a84ff;
-  --accent-2: #7b5cf6;
-  --accent-3: #30d158;
-  --text: #1c1c1e;
-  --text-2: rgba(60, 60, 67, 0.78);
-  --glass: rgba(255, 255, 255, 0.58);
-  --glass-strong: rgba(255, 255, 255, 0.78);
-  --glass-border: rgba(255, 255, 255, 0.68);
-  --shadow: 0 8px 32px rgba(31, 38, 135, 0.16), 0 2px 8px rgba(31, 38, 135, 0.08);
+  --accent: #4f8ee6;
+  --accent-2: #8a83e8;
+  --accent-3: #5cbe84;
+  --text: #22242b;
+  --text-2: rgba(60, 60, 67, 0.72);
+  --glass: rgba(255, 255, 255, 0.26);
+  --glass-strong: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.66);
+  --shadow: 0 10px 34px rgba(80, 95, 140, 0.14), 0 2px 8px rgba(80, 95, 140, 0.07);
 }
 
 * { box-sizing: border-box; }
@@ -19,19 +19,20 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC",
     "Microsoft YaHei", "Segoe UI", sans-serif;
   color: var(--text);
-  background: linear-gradient(135deg, #aee6ff 0%, #c7d2fe 22%, #f6d5f7 46%, #ffe4c2 72%, #d1f7d6 100%);
+  background: linear-gradient(135deg,
+    #e3ebf6 0%, #dcddea 22%, #efe6ee 46%, #ece5d8 72%, #dfeadd 100%);
   background-attachment: fixed;
   overflow-x: hidden;
 }
 
-/* 环境光斑（缓慢漂浮） */
+/* 柔和光斑（低饱和、低透明度） */
 body::before,
 body::after {
   content: "";
   position: fixed;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.55;
+  filter: blur(80px);
+  opacity: 0.3;
   z-index: -2;
   pointer-events: none;
 }
@@ -40,7 +41,7 @@ body::before {
   height: 55vw;
   left: -12vw;
   top: -18vw;
-  background: radial-gradient(circle, #6fc3ff, #8a5cf6);
+  background: radial-gradient(circle, #b7cff2, #c4bdf0);
   animation: blobFloat 24s ease-in-out infinite alternate;
 }
 body::after {
@@ -48,7 +49,7 @@ body::after {
   height: 50vw;
   right: -14vw;
   bottom: -20vw;
-  background: radial-gradient(circle, #ff9acb, #ffd08a);
+  background: radial-gradient(circle, #f2c7dd, #f0d9b5);
   animation: blobFloat 28s ease-in-out infinite alternate-reverse;
 }
 @keyframes blobFloat {
@@ -56,13 +57,13 @@ body::after {
   to   { transform: translate(9vw, 7vh) scale(1.18); }
 }
 
-/* 跟随鼠标的动态光晕 */
+/* 跟随鼠标的柔和光晕 */
 #liquid-sheen {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(620px circle at 50% 30%, rgba(255, 255, 255, 0.32), transparent 65%);
+  background: radial-gradient(620px circle at 50% 30%, rgba(255, 255, 255, 0.26), transparent 65%);
 }
 
 .container {
@@ -73,28 +74,27 @@ body::after {
 
 h1 {
   margin: 4px 0 22px;
-  font-size: 30px;
+  font-size: 29px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.5);
 }
 
-/* ---------- 玻璃面板 ---------- */
+/* ---------- 清透玻璃面板（无磨砂模糊） ---------- */
 .panel {
   position: relative;
   background: var(--glass);
-  -webkit-backdrop-filter: blur(26px) saturate(180%);
-  backdrop-filter: blur(26px) saturate(180%);
   border: 1px solid var(--glass-border);
-  border-radius: 28px;
-  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  border-radius: 26px;
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   padding: 24px 26px;
   margin-bottom: 20px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 .panel:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 48px rgba(31, 38, 135, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 16px 44px rgba(80, 95, 140, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 .step::before {
   content: "";
@@ -102,10 +102,10 @@ h1 {
   left: 0;
   top: 20px;
   bottom: 20px;
-  width: 5px;
-  border-radius: 0 4px 4px 0;
+  width: 4px;
+  border-radius: 0 3px 3px 0;
   background: linear-gradient(180deg, var(--accent), var(--accent-2), var(--accent-3));
-  opacity: 0.9;
+  opacity: 0.65;
 }
 .panel h2 {
   margin: 0 0 4px;
@@ -135,61 +135,58 @@ form select {
   width: 100%;
   margin-top: 7px;
   padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.55);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow: inset 0 1px 3px rgba(31, 38, 135, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.38);
+  box-shadow: inset 0 1px 3px rgba(80, 95, 140, 0.06);
   font-size: 14px;
   color: var(--text);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 form input:focus,
 form select:focus {
-  border-color: rgba(10, 132, 255, 0.55);
-  box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.14);
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(79, 142, 230, 0.55);
+  box-shadow: 0 0 0 4px rgba(79, 142, 230, 0.12);
 }
 form select {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, rgba(60, 60, 67, 0.6) 50%),
-    linear-gradient(135deg, rgba(60, 60, 67, 0.6) 50%, transparent 50%);
+  background-image: linear-gradient(45deg, transparent 50%, rgba(60, 60, 67, 0.55) 50%),
+    linear-gradient(135deg, rgba(60, 60, 67, 0.55) 50%, transparent 50%);
   background-position: calc(100% - 20px) 55%, calc(100% - 15px) 55%;
   background-size: 5px 5px;
   background-repeat: no-repeat;
 }
 
-/* ---------- 按钮（玻璃胶囊） ---------- */
+/* ---------- 玻璃按钮 ---------- */
 .btn {
   display: inline-block;
   margin-top: 4px;
   padding: 11px 24px;
-  border: 0;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 15px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.55));
   color: var(--accent);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.18), inset 0 1px 0 #fff;
+  box-shadow: 0 4px 14px rgba(80, 95, 140, 0.16), inset 0 1px 0 #fff;
   transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s;
 }
-.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(31, 38, 135, 0.26); }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(80, 95, 140, 0.22); }
 .btn:active { transform: scale(0.97); }
-.btn:disabled { opacity: 0.6; cursor: wait; }
-.btn.disabled { opacity: 0.45; pointer-events: none; cursor: not-allowed; }
-.btn.secondary { background: rgba(120, 126, 145, 0.35); color: #fff; }
+.btn:disabled { opacity: 0.55; cursor: wait; }
+.btn.disabled { opacity: 0.4; pointer-events: none; cursor: not-allowed; }
+.btn.secondary { background: rgba(120, 126, 145, 0.3); color: #fff; border-color: rgba(255, 255, 255, 0.5); }
 
 /* ---------- 进度条 ---------- */
 .progress-track {
   height: 13px;
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: inset 0 1px 3px rgba(31, 38, 135, 0.1);
+  background: rgba(255, 255, 255, 0.34);
+  box-shadow: inset 0 1px 3px rgba(80, 95, 140, 0.1);
   overflow: hidden;
   margin-bottom: 10px;
 }
@@ -197,7 +194,7 @@ form select {
   height: 100%;
   width: 0;
   border-radius: 9px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+  background: linear-gradient(90deg, #7ab8ff, #9d97f2, #7ed4a4);
   background-size: 200% 100%;
   animation: shimmer 2.6s linear infinite;
   transition: width 0.4s ease;
@@ -215,11 +212,9 @@ form select {
   margin-bottom: 14px;
 }
 .meta > div {
-  background: rgba(255, 255, 255, 0.4);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 13px;
   padding: 9px 12px;
 }
 .meta .k { display: block; font-size: 11px; color: var(--text-2); }
@@ -229,34 +224,32 @@ table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border-radius: 16px;
+  border-radius: 15px;
   overflow: hidden;
   margin-bottom: 14px;
   font-size: 14px;
 }
 th {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.34);
   color: var(--text);
   font-weight: 600;
   text-align: left;
 }
-td { background: rgba(255, 255, 255, 0.16); }
-tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.07); }
-th, td { padding: 10px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.35); }
+td { background: rgba(255, 255, 255, 0.13); }
+tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.06); }
+th, td { padding: 10px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.4); }
 tbody tr:last-child td { border-bottom: 0; }
 
 /* ---------- 提示文字 ---------- */
-.error { color: #ff453a; font-size: 13px; margin: 10px 0 0; font-weight: 500; }
+.error { color: #d9534f; font-size: 13px; margin: 10px 0 0; font-weight: 500; }
 .hidden { display: none; }
 .hint { color: var(--text-2); font-size: 12px; }
 
-/* ---------- 弹窗 ---------- */
+/* ---------- 弹窗（清透玻璃） ---------- */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(20, 24, 40, 0.35);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: rgba(25, 30, 45, 0.24);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -265,14 +258,12 @@ tbody tr:last-child td { border-bottom: 0; }
 .modal-overlay.hidden { display: none; }
 .modal-box {
   background: var(--glass-strong);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
-  backdrop-filter: blur(32px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
   padding: 24px 28px;
   max-width: 480px;
   width: 90%;
-  box-shadow: 0 24px 80px rgba(31, 38, 135, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  box-shadow: 0 22px 70px rgba(80, 95, 140, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   animation: popIn 0.22s ease;
 }
 @keyframes popIn {
