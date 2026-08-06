@@ -1,14 +1,14 @@
-/* ============ 清透玻璃主题（柔和莫兰迪配色） ============ */
+/* ============ 暗色清透玻璃主题（低饱和） ============ */
 :root {
-  --accent: #4f8ee6;
-  --accent-2: #8a83e8;
-  --accent-3: #5cbe84;
-  --text: #22242b;
-  --text-2: rgba(60, 60, 67, 0.72);
-  --glass: rgba(255, 255, 255, 0.26);
-  --glass-strong: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.66);
-  --shadow: 0 10px 34px rgba(80, 95, 140, 0.14), 0 2px 8px rgba(80, 95, 140, 0.07);
+  --accent: #6ea8ff;
+  --accent-2: #a39bf5;
+  --accent-3: #74d4a0;
+  --text: #eef1f7;
+  --text-2: rgba(220, 224, 235, 0.66);
+  --glass: rgba(255, 255, 255, 0.07);
+  --glass-strong: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.22);
+  --shadow: 0 16px 44px rgba(0, 0, 0, 0.35), 0 3px 10px rgba(0, 0, 0, 0.25);
 }
 
 * { box-sizing: border-box; }
@@ -20,19 +20,19 @@ body {
     "Microsoft YaHei", "Segoe UI", sans-serif;
   color: var(--text);
   background: linear-gradient(135deg,
-    #e3ebf6 0%, #dcddea 22%, #efe6ee 46%, #ece5d8 72%, #dfeadd 100%);
+    #151a26 0%, #1b1a2e 24%, #251f2e 48%, #221f2b 70%, #1c2626 100%);
   background-attachment: fixed;
   overflow-x: hidden;
 }
 
-/* 柔和光斑（低饱和、低透明度） */
+/* 暗色环境光斑（低饱和、低亮度） */
 body::before,
 body::after {
   content: "";
   position: fixed;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.3;
+  filter: blur(90px);
+  opacity: 0.28;
   z-index: -2;
   pointer-events: none;
 }
@@ -41,7 +41,7 @@ body::before {
   height: 55vw;
   left: -12vw;
   top: -18vw;
-  background: radial-gradient(circle, #b7cff2, #c4bdf0);
+  background: radial-gradient(circle, #2f4a73, #4a3f77);
   animation: blobFloat 24s ease-in-out infinite alternate;
 }
 body::after {
@@ -49,7 +49,7 @@ body::after {
   height: 50vw;
   right: -14vw;
   bottom: -20vw;
-  background: radial-gradient(circle, #f2c7dd, #f0d9b5);
+  background: radial-gradient(circle, #6b3f5e, #3f6655);
   animation: blobFloat 28s ease-in-out infinite alternate-reverse;
 }
 @keyframes blobFloat {
@@ -57,13 +57,13 @@ body::after {
   to   { transform: translate(9vw, 7vh) scale(1.18); }
 }
 
-/* 跟随鼠标的柔和光晕 */
+/* 跟随鼠标的光晕（暗底上更明显） */
 #liquid-sheen {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(620px circle at 50% 30%, rgba(255, 255, 255, 0.32), transparent 65%);
+  background: radial-gradient(620px circle at 50% 30%, rgba(255, 255, 255, 0.14), transparent 65%);
 }
 
 .container {
@@ -77,25 +77,25 @@ h1 {
   font-size: 29px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
 }
 
-/* ---------- 清透玻璃面板（无磨砂模糊） ---------- */
+/* ---------- 暗色玻璃面板 ---------- */
 .panel {
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.42) 0%,
-    rgba(255, 255, 255, 0.13) 38%,
-    rgba(255, 255, 255, 0.28) 65%,
-    rgba(255, 255, 255, 0.45) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.82);
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.03) 40%,
+    rgba(255, 255, 255, 0.07) 65%,
+    rgba(255, 255, 255, 0.12) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 26px;
   box-shadow:
-    0 14px 38px rgba(80, 95, 140, 0.18),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.35);
+    0 16px 44px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
   padding: 24px 26px;
   margin-bottom: 20px;
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
@@ -103,15 +103,15 @@ h1 {
 .panel:hover {
   transform: translateY(-2px);
   background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0.18) 38%,
-    rgba(255, 255, 255, 0.34) 65%,
-    rgba(255, 255, 255, 0.54) 100%);
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.05) 40%,
+    rgba(255, 255, 255, 0.09) 65%,
+    rgba(255, 255, 255, 0.16) 100%);
   box-shadow:
-    0 20px 50px rgba(80, 95, 140, 0.24),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.38),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.42);
+    0 22px 56px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
 }
 .panel::after {
   content: "";
@@ -120,8 +120,8 @@ h1 {
   pointer-events: none;
   background: linear-gradient(115deg,
     transparent 18%,
-    rgba(255, 255, 255, 0.5) 36%,
-    rgba(255, 255, 255, 0.12) 46%,
+    rgba(255, 255, 255, 0.28) 36%,
+    rgba(255, 255, 255, 0.07) 46%,
     transparent 58%);
   background-size: 240% 100%;
   background-position: 100% 0;
@@ -139,7 +139,7 @@ h1 {
   width: 4px;
   border-radius: 0 3px 3px 0;
   background: linear-gradient(180deg, var(--accent), var(--accent-2), var(--accent-3));
-  opacity: 0.65;
+  opacity: 0.85;
 }
 .panel h2 {
   margin: 0 0 4px;
@@ -169,10 +169,10 @@ form select {
   width: 100%;
   margin-top: 7px;
   padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.38);
-  box-shadow: inset 0 1px 3px rgba(80, 95, 140, 0.06);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
   font-size: 14px;
   color: var(--text);
   outline: none;
@@ -180,47 +180,57 @@ form select {
 }
 form input:focus,
 form select:focus {
-  background: rgba(255, 255, 255, 0.5);
-  border-color: rgba(79, 142, 230, 0.55);
-  box-shadow: 0 0 0 4px rgba(79, 142, 230, 0.12);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(110, 168, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(110, 168, 255, 0.16);
 }
 form select {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, rgba(60, 60, 67, 0.55) 50%),
-    linear-gradient(135deg, rgba(60, 60, 67, 0.55) 50%, transparent 50%);
+  background-image: linear-gradient(45deg, transparent 50%, rgba(230, 234, 245, 0.7) 50%),
+    linear-gradient(135deg, rgba(230, 234, 245, 0.7) 50%, transparent 50%);
   background-position: calc(100% - 20px) 55%, calc(100% - 15px) 55%;
   background-size: 5px 5px;
   background-repeat: no-repeat;
 }
+form input[type="file"]::file-selector-button {
+  border: 0;
+  border-radius: 10px;
+  padding: 7px 14px;
+  margin-right: 10px;
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
 
-/* ---------- 玻璃按钮 ---------- */
+/* ---------- 玻璃按钮（亮玻璃配深色文字，暗底上更突出） ---------- */
 .btn {
   display: inline-block;
   margin-top: 4px;
   padding: 11px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 15px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.55));
-  color: var(--accent);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.7));
+  color: #1c1f26;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 4px 14px rgba(80, 95, 140, 0.16), inset 0 1px 0 #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3), inset 0 1px 0 #fff;
   transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s;
 }
-.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(80, 95, 140, 0.22); }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.38); }
 .btn:active { transform: scale(0.97); }
-.btn:disabled { opacity: 0.55; cursor: wait; }
-.btn.disabled { opacity: 0.4; pointer-events: none; cursor: not-allowed; }
-.btn.secondary { background: rgba(120, 126, 145, 0.3); color: #fff; border-color: rgba(255, 255, 255, 0.5); }
+.btn:disabled { opacity: 0.5; cursor: wait; }
+.btn.disabled { opacity: 0.35; pointer-events: none; cursor: not-allowed; }
+.btn.secondary { background: rgba(255, 255, 255, 0.14); color: var(--text); border-color: rgba(255, 255, 255, 0.28); }
 
 /* ---------- 进度条 ---------- */
 .progress-track {
   height: 13px;
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.34);
-  box-shadow: inset 0 1px 3px rgba(80, 95, 140, 0.1);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   margin-bottom: 10px;
 }
@@ -246,8 +256,8 @@ form select {
   margin-bottom: 14px;
 }
 .meta > div {
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 13px;
   padding: 9px 12px;
 }
@@ -264,26 +274,26 @@ table {
   font-size: 14px;
 }
 th {
-  background: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--text);
   font-weight: 600;
   text-align: left;
 }
-td { background: rgba(255, 255, 255, 0.13); }
-tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.06); }
-th, td { padding: 10px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.4); }
+td { background: rgba(255, 255, 255, 0.05); }
+tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
+th, td { padding: 10px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
 tbody tr:last-child td { border-bottom: 0; }
 
 /* ---------- 提示文字 ---------- */
-.error { color: #d9534f; font-size: 13px; margin: 10px 0 0; font-weight: 500; }
+.error { color: #ff6961; font-size: 13px; margin: 10px 0 0; font-weight: 500; }
 .hidden { display: none; }
 .hint { color: var(--text-2); font-size: 12px; }
 
-/* ---------- 弹窗（清透玻璃） ---------- */
+/* ---------- 弹窗（暗色玻璃） ---------- */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(25, 30, 45, 0.24);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -291,13 +301,15 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .modal-overlay.hidden { display: none; }
 .modal-box {
-  background: var(--glass-strong);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: linear-gradient(150deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.08) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 24px;
   padding: 24px 28px;
   max-width: 480px;
   width: 90%;
-  box-shadow: 0 22px 70px rgba(80, 95, 140, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   animation: popIn 0.22s ease;
 }
 @keyframes popIn {
