@@ -44,7 +44,7 @@ function routeView() {
   const showSeat = h === "#/seat";
   if (viewHome) viewHome.classList.toggle("hidden", showSeat);
   if (viewSeat) viewSeat.classList.toggle("hidden", !showSeat);
-  document.title = showSeat ? "智能排座 · 观光列车业务平台" : "观光列车业务平台";
+  document.title = showSeat ? "智能排座 · 观光列车智能运营中台" : "观光列车智能运营中台";
 }
 if (goSeatBtn) {
   goSeatBtn.addEventListener("click", () => { location.hash = "#/seat"; });
