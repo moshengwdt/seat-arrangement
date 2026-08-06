@@ -69,66 +69,66 @@
 /* ---------- 浅色主题（莫兰迪） ---------- */
 :root[data-theme="light"] {
   color-scheme: light;
-  --accent: #4f8ee6;
-  --accent-2: #8a83e8;
-  --accent-3: #5cbe84;
-  --text: #22242b;
-  --text-2: rgba(60, 60, 67, 0.72);
+  --accent: #2f6fd6;
+  --accent-2: #6f7fe8;
+  --accent-3: #3fa871;
+  --text: #1d2530;
+  --text-2: rgba(55, 65, 85, 0.68);
   --bg-gradient: linear-gradient(135deg,
-    #e3ebf6 0%, #dcddea 22%, #efe6ee 46%, #ece5d8 72%, #dfeadd 100%);
-  --blob-1: #b7cff2;
-  --blob-2: #c4bdf0;
-  --blob-3: #f2c7dd;
-  --blob-4: #f0d9b5;
-  --blob-opacity: 0.3;
-  --sheen-color: rgba(255, 255, 255, 0.4);
-  --h1-shadow: 0 1px 10px rgba(255, 255, 255, 0.5);
+    #f6f8fc 0%, #eef3fa 32%, #edf0f8 62%, #eef2f4 100%);
+  --blob-1: #d9e6f6;
+  --blob-2: #d8ddf2;
+  --blob-3: #e6d9ef;
+  --blob-4: #d5e7e3;
+  --blob-opacity: 0.32;
+  --sheen-color: rgba(255, 255, 255, 0.45);
+  --h1-shadow: 0 1px 8px rgba(31, 55, 95, 0.06);
   --panel-grad: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.13) 38%,
-    rgba(255, 255, 255, 0.28) 65%, rgba(255, 255, 255, 0.45) 100%);
+    rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.32) 38%,
+    rgba(255, 255, 255, 0.46) 65%, rgba(255, 255, 255, 0.66) 100%);
   --panel-grad-hover: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.18) 38%,
-    rgba(255, 255, 255, 0.34) 65%, rgba(255, 255, 255, 0.54) 100%);
-  --panel-border: rgba(255, 255, 255, 0.82);
-  --shadow: 0 12px 32px rgba(80, 95, 140, 0.16);
-  --shadow-hover: 0 16px 40px rgba(80, 95, 140, 0.24);
-  --inner-ring: rgba(255, 255, 255, 0.3);
-  --inner-ring-hover: rgba(255, 255, 255, 0.38);
-  --top-edge: rgba(255, 255, 255, 0.95);
+    rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.4) 38%,
+    rgba(255, 255, 255, 0.54) 65%, rgba(255, 255, 255, 0.76) 100%);
+  --panel-border: rgba(255, 255, 255, 0.95);
+  --shadow: 0 12px 32px rgba(31, 55, 95, 0.08);
+  --shadow-hover: 0 16px 40px rgba(31, 55, 95, 0.14);
+  --inner-ring: rgba(255, 255, 255, 0.35);
+  --inner-ring-hover: rgba(255, 255, 255, 0.5);
+  --top-edge: rgba(255, 255, 255, 1);
   --top-edge-hover: rgba(255, 255, 255, 1);
-  --bottom-edge: rgba(255, 255, 255, 0.35);
-  --bottom-edge-hover: rgba(255, 255, 255, 0.42);
-  --streak: rgba(255, 255, 255, 0.5);
-  --streak-mid: rgba(255, 255, 255, 0.12);
-  --input-bg: rgba(255, 255, 255, 0.38);
-  --input-bg-focus: rgba(255, 255, 255, 0.5);
-  --input-border: rgba(255, 255, 255, 0.72);
-  --focus-ring: rgba(79, 142, 230, 0.12);
-  --btn-bg: rgba(255, 255, 255, 0.45);
-  --btn-bg-hover: rgba(255, 255, 255, 0.6);
-  --btn-border: rgba(255, 255, 255, 0.75);
-  --btn-text: #4f8ee6;
-  --btn-shadow: 0 4px 14px rgba(80, 95, 140, 0.16);
-  --btn-inset: rgba(255, 255, 255, 0.9);
-  --secondary-bg: rgba(120, 126, 145, 0.12);
-  --secondary-border: rgba(255, 255, 255, 0.6);
-  --track-bg: rgba(255, 255, 255, 0.34);
-  --chip-bg: rgba(255, 255, 255, 0.3);
-  --chip-border: rgba(255, 255, 255, 0.6);
-  --th-bg: rgba(255, 255, 255, 0.34);
-  --td-bg: rgba(255, 255, 255, 0.13);
-  --td-alt: rgba(255, 255, 255, 0.06);
-  --row-border: rgba(255, 255, 255, 0.4);
-  --overlay-bg: rgba(25, 30, 45, 0.24);
-  --popup-bg: linear-gradient(150deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
-  --popup-border: rgba(255, 255, 255, 0.8);
-  --cal-btn-bg: rgba(255, 255, 255, 0.4);
-  --cal-btn-border: rgba(255, 255, 255, 0.7);
-  --cal-icon: #4f5562;
-  --cell-hover: rgba(0, 0, 0, 0.05);
-  --select-arrow: rgba(60, 60, 67, 0.55);
-  --file-btn-bg: rgba(255, 255, 255, 0.5);
-  --file-btn-border: rgba(255, 255, 255, 0.7);
+  --bottom-edge: rgba(31, 55, 95, 0.05);
+  --bottom-edge-hover: rgba(31, 55, 95, 0.08);
+  --streak: rgba(255, 255, 255, 0.7);
+  --streak-mid: rgba(255, 255, 255, 0.2);
+  --input-bg: rgba(255, 255, 255, 0.62);
+  --input-bg-focus: rgba(255, 255, 255, 0.85);
+  --input-border: rgba(31, 55, 95, 0.12);
+  --focus-ring: rgba(47, 111, 214, 0.14);
+  --btn-bg: rgba(255, 255, 255, 0.66);
+  --btn-bg-hover: rgba(255, 255, 255, 0.85);
+  --btn-border: rgba(255, 255, 255, 0.92);
+  --btn-text: #2f6fd6;
+  --btn-shadow: 0 4px 14px rgba(31, 55, 95, 0.1);
+  --btn-inset: rgba(255, 255, 255, 0.95);
+  --secondary-bg: rgba(31, 55, 95, 0.06);
+  --secondary-border: rgba(31, 55, 95, 0.1);
+  --track-bg: rgba(31, 55, 95, 0.06);
+  --chip-bg: rgba(255, 255, 255, 0.56);
+  --chip-border: rgba(255, 255, 255, 0.85);
+  --th-bg: rgba(255, 255, 255, 0.6);
+  --td-bg: rgba(255, 255, 255, 0.34);
+  --td-alt: rgba(255, 255, 255, 0.18);
+  --row-border: rgba(31, 55, 95, 0.06);
+  --overlay-bg: rgba(20, 30, 50, 0.18);
+  --popup-bg: linear-gradient(150deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.72));
+  --popup-border: rgba(255, 255, 255, 0.95);
+  --cal-btn-bg: rgba(255, 255, 255, 0.6);
+  --cal-btn-border: rgba(31, 55, 95, 0.12);
+  --cal-icon: #3a4a63;
+  --cell-hover: rgba(31, 55, 95, 0.06);
+  --select-arrow: rgba(31, 55, 95, 0.5);
+  --file-btn-bg: rgba(255, 255, 255, 0.62);
+  --file-btn-border: rgba(31, 55, 95, 0.12);
 }
 
 * { box-sizing: border-box; }
