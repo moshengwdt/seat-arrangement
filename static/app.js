@@ -287,3 +287,12 @@ function renderSmsSummary(s) {
   smsProgress.classList.add("hidden");
   smsSummary.classList.remove("hidden");
 }
+
+// ---------- 动态毛玻璃光效（跟随鼠标） ----------
+const sheen = document.getElementById("liquid-sheen");
+if (sheen) {
+  document.addEventListener("pointermove", (e) => {
+    sheen.style.background =
+      `radial-gradient(620px circle at ${e.clientX}px ${e.clientY}px, rgba(255,255,255,0.32), transparent 65%)`;
+  });
+}
