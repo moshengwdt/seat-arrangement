@@ -293,7 +293,18 @@ const sheen = document.getElementById("liquid-sheen");
 if (sheen) {
   document.addEventListener("pointermove", (e) => {
     sheen.style.background =
-      `radial-gradient(480px circle at ${e.clientX}px ${e.clientY}px, rgba(255,255,255,0.04), transparent 65%)`;
+      `radial-gradient(480px circle at ${e.clientX}px ${e.clientY}px, var(--sheen-color), transparent 65%)`;
+  });
+}
+
+// ---------- 明暗主题切换 ----------
+const themeToggle = document.getElementById("theme-toggle");
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+    const next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("seat-theme", next); } catch (e) { /* ignore */ }
   });
 }
 
