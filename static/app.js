@@ -51,20 +51,81 @@ fetch(apiUrl("/api/schedule"))
   .then((d) => { if (d.ok) { SCHEDULE = d; populateTrains(); } })
   .catch(() => {});
 
+const trainBtn = document.getElementById("train-select-btn");
+const trainLabel = document.getElementById("train-select-label");
+const trainValue = document.getElementById("train-value");
+const trainPopup = document.createElement("div");
+trainPopup.className = "train-popup hidden";
+document.body.appendChild(trainPopup);
+let TRAIN_LIST = [];
+
+function renderTrainOptions() {
+  if (!trainPopup) return;
+  const current = (trainValue.value || "").trim();
+  trainPopup.innerHTML = "";
+  for (const t of TRAIN_LIST) {
+    const opt = document.createElement("button");
+    opt.type = "button";
+    opt.className = "train-option" + (t.id === current ? " selected" : "");
+    opt.dataset.value = t.id;
+    opt.textContent = t.name;
+    trainPopup.appendChild(opt);
+  }
+}
+
 function populateTrains() {
-  const sel = seatForm.train;
-  const list = (SCHEDULE && SCHEDULE.trains) || [
+  TRAIN_LIST = (SCHEDULE && SCHEDULE.trains) || [
     { id: "wuyishan", name: "武夷山国家公园主题观光列车" },
     { id: "shangrao", name: "大美上饶主题观光列车" },
   ];
-  sel.innerHTML = '<option value="">请选择列车</option>';
-  for (const t of list) {
-    const opt = document.createElement("option");
-    opt.value = t.id;
-    opt.textContent = t.name;
-    sel.appendChild(opt);
-  }
+  renderTrainOptions();
 }
+
+function openTrainDropdown() {
+  if (!trainBtn) return;
+  renderTrainOptions();
+  const r = trainBtn.getBoundingClientRect();
+  trainPopup.classList.remove("hidden");
+  const pw = trainPopup.offsetWidth || 280;
+  const ph = trainPopup.offsetHeight || 200;
+  const gap = 12;
+  const maxLeft = Math.max(gap, window.innerWidth - pw - gap);
+  trainPopup.style.left = Math.max(gap, Math.min(r.left, maxLeft)) + "px";
+  let top = r.bottom + 8;
+  if (top + ph > window.innerHeight - gap) {
+    top = Math.max(gap, r.top - ph - 8);
+  }
+  trainPopup.style.top = top + "px";
+  trainBtn.setAttribute("aria-expanded", "true");
+}
+
+function closeTrainDropdown() {
+  trainPopup.classList.add("hidden");
+  if (trainBtn) trainBtn.setAttribute("aria-expanded", "false");
+}
+
+if (trainBtn) {
+  trainBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (trainPopup.classList.contains("hidden")) openTrainDropdown(); else closeTrainDropdown();
+  });
+}
+trainPopup.addEventListener("click", (e) => {
+  const opt = e.target.closest(".train-option");
+  if (!opt) return;
+  trainValue.value = opt.dataset.value;
+  trainLabel.textContent = opt.textContent;
+  closeTrainDropdown();
+});
+document.addEventListener("click", (e) => {
+  if (!trainPopup.contains(e.target) && e.target !== trainBtn && !e.target.closest(".train-wrap")) {
+    closeTrainDropdown();
+  }
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeTrainDropdown(); });
+window.addEventListener("resize", closeTrainDropdown);
+
 populateTrains();
 
 // ---------- 弹窗（提示 / 人工确认） ----------

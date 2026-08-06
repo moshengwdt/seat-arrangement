@@ -15,7 +15,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="static/style.css?v=20260818" />
+  <link rel="stylesheet" href="static/style.css?v=20260819" />
 </head>
 <body>
   <button type="button" class="theme-toggle" id="theme-toggle" aria-label="切换明暗主题">
@@ -47,9 +47,12 @@
         </label>
         <label>
           列车
-          <select name="train" required>
-            <option value="">请选择列车</option>
-          </select>
+          <div class="train-wrap">
+            <button type="button" class="glass-select" id="train-select-btn" aria-haspopup="listbox" aria-expanded="false">
+              <span id="train-select-label">请选择列车</span>
+            </button>
+            <input type="hidden" name="train" id="train-value" value="" />
+          </div>
         </label>
         <label>
           游玩日期
@@ -128,7 +131,7 @@
     </div>
   </div>
 
-  <script src="static/config.js?v=20260818"></script>
-  <script src="static/app.js?v=20260818"></script>
+  <script src="static/config.js?v=20260819"></script>
+  <script src="static/app.js?v=20260819"></script>
 </body>
 </html>

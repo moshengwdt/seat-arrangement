@@ -335,6 +335,69 @@ form input[type="file"]::file-selector-button {
 /* ---------- 玻璃日期选择器 ---------- */
 .date-wrap { position: relative; margin-top: 7px; width: 100%; min-width: 0; max-width: 100%; }
 .date-wrap input[type="date"] { margin-top: 0; padding-right: 46px; max-width: 100%; }
+
+/* ---------- 玻璃列车下拉框 ---------- */
+.train-wrap { position: relative; margin-top: 7px; width: 100%; min-width: 0; max-width: 100%; }
+.glass-select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 12px 38px 12px 14px;
+  border: 1px solid var(--input-border);
+  border-radius: 14px;
+  background: var(--input-bg);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+  font-size: 14px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, color 0.35s;
+  background-image: linear-gradient(45deg, transparent 50%, var(--select-arrow) 50%),
+    linear-gradient(135deg, var(--select-arrow) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 55%, calc(100% - 15px) 55%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+.glass-select:hover { background-color: var(--input-bg-focus); }
+.glass-select:focus-visible {
+  background: var(--input-bg-focus);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+.train-popup {
+  position: fixed;
+  z-index: 200;
+  width: 280px;
+  max-width: calc(100vw - 24px);
+  padding: 8px;
+  border-radius: 18px;
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.3), inset 0 1px 0 var(--top-edge);
+  color: var(--text);
+}
+.train-option {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.train-option:hover { background: var(--cell-hover); }
+.train-option.selected {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 600;
+}
+
 .date-cal-btn {
   position: absolute;
   right: 6px;
@@ -416,6 +479,7 @@ form input[type="file"]::file-selector-button {
   h1 { font-size: 24px; }
   .theme-toggle { top: 12px; right: 12px; width: 38px; height: 38px; }
   .date-popup { width: calc(100vw - 24px); max-width: 320px; }
+  .train-popup { width: calc(100vw - 24px); max-width: 320px; }
 }
 
 /* ---------- 玻璃按钮 ---------- */
