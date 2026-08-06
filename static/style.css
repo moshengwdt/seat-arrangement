@@ -10,12 +10,12 @@
   --text: #eef1f7;
   --text-2: rgba(220, 224, 235, 0.66);
   --bg-gradient: linear-gradient(135deg,
-    #151a26 0%, #1b1a2e 24%, #251f2e 48%, #221f2b 70%, #1c2626 100%);
-  --blob-1: #2f4a73;
-  --blob-2: #4a3f77;
-  --blob-3: #6b3f5e;
-  --blob-4: #3f6655;
-  --blob-opacity: 0.2;
+    #141a2b 0%, #1c1b38 24%, #2b2039 48%, #222533 70%, #172b2c 100%);
+  --blob-1: #33527e;
+  --blob-2: #51459b;
+  --blob-3: #7a4668;
+  --blob-4: #3f7463;
+  --blob-opacity: 0.26;
   --sheen-color: rgba(255, 255, 255, 0.04);
   --h1-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
   --panel-grad: linear-gradient(135deg,
@@ -24,17 +24,17 @@
   --panel-grad-hover: linear-gradient(135deg,
     rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.03) 40%,
     rgba(255, 255, 255, 0.06) 65%, rgba(255, 255, 255, 0.11) 100%);
-  --panel-border: rgba(255, 255, 255, 0.17);
+  --panel-border: rgba(255, 255, 255, 0.2);
   --shadow: 0 12px 32px rgba(0, 0, 0, 0.26);
   --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.32);
-  --inner-ring: rgba(255, 255, 255, 0.09);
-  --inner-ring-hover: rgba(255, 255, 255, 0.12);
+  --inner-ring: rgba(255, 255, 255, 0.11);
+  --inner-ring-hover: rgba(255, 255, 255, 0.14);
   --top-edge: rgba(255, 255, 255, 0.18);
   --top-edge-hover: rgba(255, 255, 255, 0.24);
   --bottom-edge: rgba(255, 255, 255, 0.05);
   --bottom-edge-hover: rgba(255, 255, 255, 0.06);
-  --streak: rgba(255, 255, 255, 0.12);
-  --streak-mid: rgba(255, 255, 255, 0.03);
+  --streak: rgba(255, 255, 255, 0.16);
+  --streak-mid: rgba(255, 255, 255, 0.05);
   --input-bg: rgba(255, 255, 255, 0.08);
   --input-bg-focus: rgba(255, 255, 255, 0.12);
   --input-border: rgba(255, 255, 255, 0.22);
@@ -75,60 +75,60 @@
   --text: #1d2530;
   --text-2: rgba(55, 65, 85, 0.68);
   --bg-gradient: linear-gradient(135deg,
-    #f6f8fc 0%, #eef3fa 32%, #edf0f8 62%, #eef2f4 100%);
-  --blob-1: #d9e6f6;
-  --blob-2: #d8ddf2;
-  --blob-3: #e6d9ef;
-  --blob-4: #d5e7e3;
-  --blob-opacity: 0.32;
-  --sheen-color: rgba(255, 255, 255, 0.45);
-  --h1-shadow: 0 1px 8px rgba(31, 55, 95, 0.06);
+    #e6f0ff 0%, #dbe6fb 22%, #e0dcf7 45%, #eedcf2 65%, #d5e9ec 85%, #e4effc 100%);
+  --blob-1: #bcd8f8;
+  --blob-2: #b8c2f5;
+  --blob-3: #eac2e8;
+  --blob-4: #b4e0d8;
+  --blob-opacity: 0.5;
+  --sheen-color: rgba(255, 255, 255, 0.52);
+  --h1-shadow: 0 1px 8px rgba(31, 55, 95, 0.08);
   --panel-grad: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.32) 38%,
-    rgba(255, 255, 255, 0.46) 65%, rgba(255, 255, 255, 0.66) 100%);
+    rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.24) 38%,
+    rgba(255, 255, 255, 0.38) 65%, rgba(255, 255, 255, 0.55) 100%);
   --panel-grad-hover: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.4) 38%,
-    rgba(255, 255, 255, 0.54) 65%, rgba(255, 255, 255, 0.76) 100%);
-  --panel-border: rgba(255, 255, 255, 0.95);
-  --shadow: 0 12px 32px rgba(31, 55, 95, 0.08);
-  --shadow-hover: 0 16px 40px rgba(31, 55, 95, 0.14);
-  --inner-ring: rgba(255, 255, 255, 0.35);
-  --inner-ring-hover: rgba(255, 255, 255, 0.5);
-  --top-edge: rgba(255, 255, 255, 1);
+    rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.32) 38%,
+    rgba(255, 255, 255, 0.46) 65%, rgba(255, 255, 255, 0.66) 100%);
+  --panel-border: rgba(116, 148, 205, 0.3);
+  --shadow: 0 14px 34px rgba(66, 102, 170, 0.16);
+  --shadow-hover: 0 18px 44px rgba(66, 102, 170, 0.22);
+  --inner-ring: rgba(255, 255, 255, 0.8);
+  --inner-ring-hover: rgba(255, 255, 255, 0.95);
+  --top-edge: rgba(255, 255, 255, 0.98);
   --top-edge-hover: rgba(255, 255, 255, 1);
-  --bottom-edge: rgba(31, 55, 95, 0.05);
-  --bottom-edge-hover: rgba(31, 55, 95, 0.08);
-  --streak: rgba(255, 255, 255, 0.7);
-  --streak-mid: rgba(255, 255, 255, 0.2);
-  --input-bg: rgba(255, 255, 255, 0.62);
-  --input-bg-focus: rgba(255, 255, 255, 0.85);
-  --input-border: rgba(31, 55, 95, 0.12);
-  --focus-ring: rgba(47, 111, 214, 0.14);
-  --btn-bg: rgba(255, 255, 255, 0.66);
-  --btn-bg-hover: rgba(255, 255, 255, 0.85);
+  --bottom-edge: rgba(90, 122, 180, 0.16);
+  --bottom-edge-hover: rgba(90, 122, 180, 0.2);
+  --streak: rgba(255, 255, 255, 0.92);
+  --streak-mid: rgba(255, 255, 255, 0.4);
+  --input-bg: rgba(255, 255, 255, 0.55);
+  --input-bg-focus: rgba(255, 255, 255, 0.8);
+  --input-border: rgba(90, 122, 180, 0.22);
+  --focus-ring: rgba(47, 111, 214, 0.16);
+  --btn-bg: rgba(255, 255, 255, 0.6);
+  --btn-bg-hover: rgba(255, 255, 255, 0.8);
   --btn-border: rgba(255, 255, 255, 0.92);
   --btn-text: #2f6fd6;
-  --btn-shadow: 0 4px 14px rgba(31, 55, 95, 0.1);
-  --btn-inset: rgba(255, 255, 255, 0.95);
-  --secondary-bg: rgba(31, 55, 95, 0.06);
-  --secondary-border: rgba(31, 55, 95, 0.1);
-  --track-bg: rgba(31, 55, 95, 0.06);
-  --chip-bg: rgba(255, 255, 255, 0.56);
+  --btn-shadow: 0 6px 16px rgba(66, 102, 170, 0.14);
+  --btn-inset: rgba(255, 255, 255, 0.98);
+  --secondary-bg: rgba(255, 255, 255, 0.5);
+  --secondary-border: rgba(116, 148, 205, 0.22);
+  --track-bg: rgba(90, 122, 180, 0.1);
+  --chip-bg: rgba(255, 255, 255, 0.5);
   --chip-border: rgba(255, 255, 255, 0.85);
-  --th-bg: rgba(255, 255, 255, 0.6);
-  --td-bg: rgba(255, 255, 255, 0.34);
-  --td-alt: rgba(255, 255, 255, 0.18);
-  --row-border: rgba(31, 55, 95, 0.06);
-  --overlay-bg: rgba(20, 30, 50, 0.18);
-  --popup-bg: linear-gradient(150deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.72));
-  --popup-border: rgba(255, 255, 255, 0.95);
-  --cal-btn-bg: rgba(255, 255, 255, 0.6);
-  --cal-btn-border: rgba(31, 55, 95, 0.12);
-  --cal-icon: #3a4a63;
-  --cell-hover: rgba(31, 55, 95, 0.06);
-  --select-arrow: rgba(31, 55, 95, 0.5);
-  --file-btn-bg: rgba(255, 255, 255, 0.62);
-  --file-btn-border: rgba(31, 55, 95, 0.12);
+  --th-bg: rgba(255, 255, 255, 0.55);
+  --td-bg: rgba(255, 255, 255, 0.3);
+  --td-alt: rgba(255, 255, 255, 0.16);
+  --row-border: rgba(90, 122, 180, 0.08);
+  --overlay-bg: rgba(30, 45, 75, 0.22);
+  --popup-bg: linear-gradient(150deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.66));
+  --popup-border: rgba(255, 255, 255, 0.92);
+  --cal-btn-bg: rgba(255, 255, 255, 0.55);
+  --cal-btn-border: rgba(90, 122, 180, 0.16);
+  --cal-icon: #33425c;
+  --cell-hover: rgba(90, 122, 180, 0.08);
+  --select-arrow: rgba(51, 66, 92, 0.55);
+  --file-btn-bg: rgba(255, 255, 255, 0.55);
+  --file-btn-border: rgba(90, 122, 180, 0.16);
 }
 
 * { box-sizing: border-box; }
