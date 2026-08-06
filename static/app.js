@@ -237,11 +237,13 @@ seatForm.addEventListener("submit", (e) => {
   if (v) { showModal("日期校验", v.msg); return; }
   const file = seatForm.file.files[0];
   const orders = seatForm.orders.files[0];
+  const trainId = seatForm.train.value;
+  const trainName = (TRAIN_LIST.find((t) => t.id === trainId) || {}).name || trainId;
   const msg =
     `确认开始排座？\n` +
     `· 游客信息表：${file ? file.name : "（未选择）"}\n` +
-    `· 订单维度表：${orders ? orders.name : "（未提供，将回退游客表信息）"}\n` +
-    `· 列车：${seatForm.train.value}\n· 游玩日期：${seatForm.date.value}`;
+    `· 订单数据表：${orders ? orders.name : "（未提供，将回退游客表信息）"}\n` +
+    `· 列车：${trainName}\n· 游玩日期：${seatForm.date.value}`;
   showConfirm("人工确认", msg, () => runSeat());
 });
 
