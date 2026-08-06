@@ -349,9 +349,17 @@ function initGlassDatePicker(input) {
     view = { y: now.getFullYear(), m: now.getMonth() };
     render();
     const r = input.getBoundingClientRect();
-    popup.style.left = Math.min(r.left, window.innerWidth - 320) + "px";
-    popup.style.top = (r.bottom + 8) + "px";
     popup.classList.remove("hidden");
+    const pw = popup.offsetWidth || 300;
+    const ph = popup.offsetHeight || 260;
+    const gap = 12;
+    const maxLeft = Math.max(gap, window.innerWidth - pw - gap);
+    popup.style.left = Math.max(gap, Math.min(r.left, maxLeft)) + "px";
+    let top = r.bottom + 8;
+    if (top + ph > window.innerHeight - gap) {
+      top = Math.max(gap, r.top - ph - 8);
+    }
+    popup.style.top = top + "px";
   }
   function close() { popup.classList.add("hidden"); }
 

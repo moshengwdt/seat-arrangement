@@ -288,6 +288,8 @@ form input[type="date"],
 form select {
   display: block;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   margin-top: 7px;
   padding: 12px 14px;
   border: 1px solid var(--input-border);
@@ -306,13 +308,18 @@ form select:focus {
   box-shadow: 0 0 0 4px var(--focus-ring);
 }
 form select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
+  padding-right: 38px;
+  cursor: pointer;
   background-image: linear-gradient(45deg, transparent 50%, var(--select-arrow) 50%),
     linear-gradient(135deg, var(--select-arrow) 50%, transparent 50%);
   background-position: calc(100% - 20px) 55%, calc(100% - 15px) 55%;
   background-size: 5px 5px;
   background-repeat: no-repeat;
 }
+select::-ms-expand { display: none; }
 input[type="date"]::-webkit-calendar-picker-indicator { display: none; }
 form input[type="file"]::file-selector-button {
   border: 1px solid var(--file-btn-border);
@@ -326,8 +333,8 @@ form input[type="file"]::file-selector-button {
 }
 
 /* ---------- 玻璃日期选择器 ---------- */
-.date-wrap { position: relative; margin-top: 7px; }
-.date-wrap input[type="date"] { margin-top: 0; padding-right: 46px; }
+.date-wrap { position: relative; margin-top: 7px; width: 100%; min-width: 0; max-width: 100%; }
+.date-wrap input[type="date"] { margin-top: 0; padding-right: 46px; max-width: 100%; }
 .date-cal-btn {
   position: absolute;
   right: 6px;
@@ -352,6 +359,7 @@ form input[type="file"]::file-selector-button {
   position: fixed;
   z-index: 200;
   width: 300px;
+  max-width: calc(100vw - 24px);
   padding: 14px;
   border-radius: 18px;
   background: var(--popup-bg);
@@ -400,6 +408,15 @@ form input[type="file"]::file-selector-button {
   font-weight: 600;
 }
 .date-cell.empty { pointer-events: none; }
+
+/* ---------- 移动端自适应 ---------- */
+@media (max-width: 560px) {
+  .container { padding: 30px 14px 52px; }
+  .panel { padding: 20px 18px; }
+  h1 { font-size: 24px; }
+  .theme-toggle { top: 12px; right: 12px; width: 38px; height: 38px; }
+  .date-popup { width: calc(100vw - 24px); max-width: 320px; }
+}
 
 /* ---------- 玻璃按钮 ---------- */
 .btn {
