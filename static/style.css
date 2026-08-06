@@ -376,8 +376,8 @@ form input[type="file"]::file-selector-button {
   background: var(--popup-bg);
   border: 1px solid var(--popup-border);
   box-shadow: 0 18px 54px rgba(0, 0, 0, 0.3), inset 0 1px 0 var(--top-edge);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(8px) saturate(1.15);
+  backdrop-filter: blur(8px) saturate(1.15);
   color: var(--text);
 }
 .train-option {
@@ -430,8 +430,8 @@ form input[type="file"]::file-selector-button {
   background: var(--popup-bg);
   border: 1px solid var(--popup-border);
   box-shadow: 0 18px 54px rgba(0, 0, 0, 0.3), inset 0 1px 0 var(--top-edge);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(8px) saturate(1.15);
+  backdrop-filter: blur(8px) saturate(1.15);
   color: var(--text);
 }
 .date-popup-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
@@ -480,8 +480,8 @@ form input[type="file"]::file-selector-button {
 .train-popup,
 .date-popup {
   background: linear-gradient(150deg, rgba(40, 45, 62, 0.78), rgba(28, 32, 46, 0.7));
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.15);
+  backdrop-filter: blur(8px) saturate(1.15);
 }
 :root[data-theme="light"] .train-popup,
 :root[data-theme="light"] .date-popup {
@@ -605,8 +605,8 @@ tbody tr:last-child td { border-bottom: 0; }
   max-width: 480px;
   width: 90%;
   box-shadow: 0 18px 54px rgba(0, 0, 0, 0.32), inset 0 1px 0 var(--top-edge);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  backdrop-filter: blur(10px) saturate(1.15);
   animation: popIn 0.22s ease;
 }
 @keyframes popIn {
