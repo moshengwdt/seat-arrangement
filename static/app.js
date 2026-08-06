@@ -34,6 +34,24 @@ const modalConfirm = document.getElementById("modal-confirm");
 const originInfo = document.getElementById("origin-info");
 if (originInfo) originInfo.textContent = "页面来源：" + location.origin;
 
+// ---------- 视图路由：平台首页 / 排座模块 ----------
+const viewHome = document.getElementById("view-home");
+const viewSeat = document.getElementById("view-seat");
+const goSeatBtn = document.getElementById("go-seat");
+
+function routeView() {
+  const h = (location.hash || "#/home").replace(/^#\/?/, "#/");
+  const showSeat = h === "#/seat";
+  if (viewHome) viewHome.classList.toggle("hidden", showSeat);
+  if (viewSeat) viewSeat.classList.toggle("hidden", !showSeat);
+  document.title = showSeat ? "智能排座 · 观光列车业务平台" : "观光列车业务平台";
+}
+if (goSeatBtn) {
+  goSeatBtn.addEventListener("click", () => { location.hash = "#/seat"; });
+}
+window.addEventListener("hashchange", routeView);
+routeView();
+
 // ---------- 公网发布配置 ----------
 const API_BASE = (window.SEAT_CONFIG && window.SEAT_CONFIG.apiBase) || "";
 const TOKEN = (window.SEAT_CONFIG && window.SEAT_CONFIG.token) || "";
