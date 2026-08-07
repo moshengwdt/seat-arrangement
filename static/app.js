@@ -545,9 +545,26 @@ function renderCarGrid(car, occ) {
       continue;
     }
     if (vip) {
-      let inner = "";
-      for (const ri of b.rows) inner += renderSeatRow(rows[ri], occ, car, true);
-      html += `<div class="vip-room"><span class="vip-room-tag">${b.no}号包厢</span><div class="vip-room-grid">${inner}</div></div>`;
+      const seats = [];
+      for (const ri of b.rows) {
+        for (const v of rows[ri]) {
+          if (/^\d+[A-H]$/.test(v)) seats.push(v);
+        }
+      }
+      seats.sort();
+      let inner = `<div class="vip-seats">`;
+      for (const s of seats) {
+        const code = `${car.no}车-${s}`;
+        const info = occ[code];
+        if (info) {
+          const tip = `${info.name} · ${info.id}`;
+          inner += `<div class="cell cell-seat occupied" data-tip="${escapeHtml(tip)}">${escapeHtml(s)}</div>`;
+        } else {
+          inner += `<div class="cell cell-seat">${escapeHtml(s)}</div>`;
+        }
+      }
+      inner += `</div>`;
+      html += `<div class="vip-room"><span class="vip-room-tag">${b.no}号包厢</span>${inner}</div>`;
     } else {
       if (prevRows) html += `<div class="row-sep"></div>`;
       for (const ri of b.rows) html += renderSeatRow(rows[ri], occ, car, false);

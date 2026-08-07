@@ -735,7 +735,11 @@ form input[type="file"]::file-selector-button {
   color: var(--accent);
   white-space: nowrap;
 }
-.vip-room-grid { display: flex; flex-direction: column; gap: 4px; }
+.vip-seats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
 .cell {
   min-height: 30px;
   border-radius: 8px;
