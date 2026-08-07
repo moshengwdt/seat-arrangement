@@ -702,10 +702,40 @@ form input[type="file"]::file-selector-button {
   color: var(--text-2);
 }
 .car-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.seat-row {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
 }
+.row-sep {
+  height: 0;
+  border-top: 1px dashed var(--panel-border);
+  margin: 3px 2px 1px;
+}
+.vip-room {
+  position: relative;
+  border: 1px solid var(--accent-2);
+  border-radius: 12px;
+  padding: 9px 8px 7px;
+  background: var(--td-bg);
+}
+.vip-room-tag {
+  position: absolute;
+  top: -9px;
+  left: 10px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  font-size: 10px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.vip-room-grid { display: flex; flex-direction: column; gap: 4px; }
 .cell {
   min-height: 30px;
   border-radius: 8px;
@@ -784,7 +814,7 @@ form input[type="file"]::file-selector-button {
   .date-popup { width: calc(100vw - 24px); max-width: 320px; }
   .train-popup { width: calc(100vw - 24px); max-width: 320px; }
   .car-block { flex-basis: 100%; max-width: none; }
-  .car-grid { gap: 4px; }
+  .seat-row { gap: 4px; }
   .cell { min-height: 26px; font-size: 10px; }
 }
 

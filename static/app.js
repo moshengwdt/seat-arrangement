@@ -473,32 +473,86 @@ function buildOccupancy(data, segNo) {
   return occ;
 }
 
-function renderCarGrid(car, occ) {
-  let html = `<div class="car-grid">`;
-  for (const row of (car.grid || [])) {
-    if (!row.some((v) => v !== "")) continue;
-    for (let ci = 0; ci < row.length; ci++) {
-      const v = row[ci];
-      if (v === "多功能区") {
-        html += `<div class="cell-multi-sep"></div>`;
-        break;
-      }
-      if (v === "") { html += `<div class="cell cell-empty"></div>`; continue; }
-      if (v === "桌") { html += `<div class="cell cell-table">桌</div>`; continue; }
-      if (v === "过道") { html += `<div class="cell cell-aisle"></div>`; continue; }
-      if (/^\d+[A-H]$/.test(v)) {
-        const code = `${car.no}车-${v}`;
-        const info = occ[code];
-        if (info) {
-          const tip = `${info.name} · ${info.id}`;
-          html += `<div class="cell cell-seat occupied" data-tip="${escapeHtml(tip)}">${escapeHtml(v)}</div>`;
-        } else {
-          html += `<div class="cell cell-seat">${escapeHtml(v)}</div>`;
-        }
-        continue;
-      }
-      html += `<div class="cell cell-empty"></div>`;
+function seatNoInRow(row) {
+  for (const v of row) {
+    const m = /^(\d+)[A-H]$/.exec(v);
+    if (m) return Number(m[1]);
+  }
+  return null;
+}
+
+function renderSeatRow(row, occ, car, vipMode) {
+  let html = `<div class="seat-row">`;
+  for (let ci = 0; ci < row.length; ci++) {
+    const v = row[ci];
+    if (v === "多功能区") { html += `<div class="cell-multi-sep"></div>`; break; }
+    if (v === "") { html += `<div class="cell cell-empty"></div>`; continue; }
+    if (v === "桌" || v === "过道") {
+      if (vipMode) { html += `<div class="cell cell-empty"></div>`; }
+      else if (v === "桌") { html += `<div class="cell cell-table">桌</div>`; }
+      else { html += `<div class="cell cell-aisle"></div>`; }
+      continue;
     }
+    if (/^\d+[A-H]$/.test(v)) {
+      const code = `${car.no}车-${v}`;
+      const info = occ[code];
+      if (info) {
+        const tip = `${info.name} · ${info.id}`;
+        html += `<div class="cell cell-seat occupied" data-tip="${escapeHtml(tip)}">${escapeHtml(v)}</div>`;
+      } else {
+        html += `<div class="cell cell-seat">${escapeHtml(v)}</div>`;
+      }
+      continue;
+    }
+    html += `<div class="cell cell-empty"></div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function renderCarGrid(car, occ) {
+  const rows = car.grid || [];
+  const blocks = [];
+  let cur = null;
+  for (let ri = 0; ri < rows.length; ri++) {
+    const row = rows[ri];
+    if (row.includes("多功能区")) {
+      if (cur) { blocks.push(cur); cur = null; }
+      blocks.push({ type: "multi" });
+      continue;
+    }
+    const no = seatNoInRow(row);
+    if (no !== null) {
+      if (!cur || cur.no !== no) {
+        if (cur) blocks.push(cur);
+        cur = { type: "rows", no: no, rows: [ri] };
+      } else {
+        cur.rows.push(ri);
+      }
+    } else if (cur) {
+      cur.rows.push(ri);
+    }
+  }
+  if (cur) blocks.push(cur);
+
+  const vip = car.type === "vip";
+  let html = `<div class="car-grid">`;
+  let prevRows = false;
+  for (const b of blocks) {
+    if (b.type === "multi") {
+      html += `<div class="cell-multi-sep"></div>`;
+      prevRows = false;
+      continue;
+    }
+    if (vip) {
+      let inner = "";
+      for (const ri of b.rows) inner += renderSeatRow(rows[ri], occ, car, true);
+      html += `<div class="vip-room"><span class="vip-room-tag">${b.no}号包厢</span><div class="vip-room-grid">${inner}</div></div>`;
+    } else {
+      if (prevRows) html += `<div class="row-sep"></div>`;
+      for (const ri of b.rows) html += renderSeatRow(rows[ri], occ, car, false);
+    }
+    prevRows = true;
   }
   html += `</div>`;
   return html;
