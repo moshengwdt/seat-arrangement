@@ -481,7 +481,7 @@ function renderCarGrid(car, occ) {
       const v = row[ci];
       if (v === "多功能区") {
         html += `<div class="cell-multi-sep"></div>`;
-        continue;
+        break;
       }
       if (v === "") { html += `<div class="cell cell-empty"></div>`; continue; }
       if (v === "桌") { html += `<div class="cell cell-table">桌</div>`; continue; }
