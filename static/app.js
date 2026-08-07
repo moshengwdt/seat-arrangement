@@ -552,7 +552,8 @@ function renderCarGrid(car, occ) {
         }
       }
       seats.sort();
-      let inner = `<div class="vip-seats">`;
+      let inner = `<div class="seat-row vip-row">`;
+      inner += `<div class="cell cell-room" title="${b.no}号包厢">${b.no}</div>`;
       for (const s of seats) {
         const code = `${car.no}车-${s}`;
         const info = occ[code];
@@ -563,8 +564,9 @@ function renderCarGrid(car, occ) {
           inner += `<div class="cell cell-seat">${escapeHtml(s)}</div>`;
         }
       }
+      for (let i = seats.length; i < 4; i++) inner += `<div class="cell cell-empty"></div>`;
       inner += `</div>`;
-      html += `<div class="vip-room"><span class="vip-room-tag">${b.no}号包厢</span>${inner}</div>`;
+      html += `<div class="vip-room">${inner}</div>`;
     } else {
       if (prevRows) html += `<div class="row-sep"></div>`;
       for (const ri of b.rows) html += renderSeatRow(rows[ri], occ, car, false);
