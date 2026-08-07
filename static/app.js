@@ -564,7 +564,9 @@ function renderCarGrid(car, occ) {
         }
       }
       inner += `</div>`;
-      html += `<div class="vip-room"><span class="vip-room-tag">${b.no}号包厢</span>${inner}</div>`;
+      html += `<div class="seat-row vip-row">` +
+        `<div class="cell cell-room" title="${b.no}号包厢">${b.no}</div>` +
+        `<div class="vip-room">${inner}</div></div>`;
     } else {
       if (prevRows) html += `<div class="row-sep"></div>`;
       for (const ri of b.rows) html += renderSeatRow(rows[ri], occ, car, false);
