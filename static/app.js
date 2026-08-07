@@ -403,6 +403,7 @@ if (themeToggle) {
 
 // ---------- 列车运营情况（座位图） ----------
 let seatmapLoading = false;
+let seatmapTrain = null;
 
 async function loadSeatMap() {
   if (!seatmapRoot || seatmapLoading) return;
@@ -410,26 +411,38 @@ async function loadSeatMap() {
   if (seatmapStatus) seatmapStatus.textContent = "加载中…";
   if (seatmapRoot) seatmapRoot.innerHTML = "";
   try {
-    const lr = await fetch(apiUrl("/api/latest"));
-    const latest = await lr.json();
-    if (!latest.ok) {
-      showSeatmapMessage("暂无排座结果，请先在「智能排座」完成一次排座。");
-      return;
-    }
-    const summary = latest.summary || {};
-    const route = String(summary.route || "");
-    const trainBase = route.replace(/\d+$/, "");
-    const [dataResp, layoutResp] = await Promise.all([
-      fetch(apiUrl(latest.download)),
-      fetch(apiUrl("/api/layout?train=" + encodeURIComponent(trainBase))),
+    const [layoutsResp, latestResp] = await Promise.all([
+      fetch(apiUrl("/api/layouts")),
+      fetch(apiUrl("/api/latest")).catch(() => null),
     ]);
-    if (!layoutResp.ok) {
-      showSeatmapMessage("该列车的座位布局尚未配置（当前仅上饶列车可用）。");
+    const layouts = (layoutsResp.ok ? (await layoutsResp.json()).layouts : []) || [];
+    if (!layouts.length) {
+      showSeatmapMessage("暂无可用列车布局。");
       return;
     }
-    const data = await dataResp.json();
+    let latest = null;
+    if (latestResp && latestResp.ok) latest = await latestResp.json();
+    let trainId = layouts[0].id;
+    let data = null;
+    let summary = {};
+    if (latest && latest.ok) {
+      const route = String((latest.summary || {}).route || "");
+      const base = route.replace(/\d+$/, "");
+      if (layouts.some((l) => l.id === base)) trainId = base;
+      if (base === trainId) {
+        summary = latest.summary || {};
+        const dr = await fetch(apiUrl(latest.download));
+        if (dr.ok) data = await dr.json();
+      }
+    }
+    if (seatmapTrain && layouts.some((l) => l.id === seatmapTrain)) trainId = seatmapTrain;
+    const layoutResp = await fetch(apiUrl("/api/layout?train=" + encodeURIComponent(trainId)));
+    if (!layoutResp.ok) {
+      showSeatmapMessage("布局加载失败，请稍后重试。");
+      return;
+    }
     const layout = await layoutResp.json();
-    renderSeatMap(layout, data, summary);
+    renderSeatMap(layout, data, summary, layouts, trainId);
   } catch (err) {
     showSeatmapMessage("座位图加载失败：" + err.message);
   } finally {
@@ -517,23 +530,34 @@ function renderNouse(data, segNo) {
     : "";
 }
 
-function renderSeatMap(layout, data, summary) {
-  const segs = (Array.isArray(data.segments) && data.segments.length)
-    ? data.segments : (Array.isArray(summary.segments) ? summary.segments : []);
-  const segLabels = segs.map((s, i) =>
-    (typeof s === "string" && s) ? s : (s && s.pair ? s.pair : `段${i + 1}`));
+function renderSeatMap(layout, data, summary, layouts, activeTrain) {
+  const hasData = !!data && Array.isArray(data.orders);
   if (seatmapStatus) {
-    seatmapStatus.textContent = `${layout.label || ""} · ${data.date || summary.date || ""}`;
+    seatmapStatus.textContent = hasData
+      ? `${layout.label || ""} · ${data.date || summary.date || ""}`
+      : `${layout.label || ""} · 暂无排座结果（空座位图）`;
   }
-  let html = `<div class="seatmap-meta">` +
+  let html = `<div class="seg-tabs train-tabs">` +
+    (layouts || []).map((l) =>
+      `<button type="button" class="seg-tab${l.id === activeTrain ? " active" : ""}" data-train="${escapeHtml(l.id)}">${escapeHtml(l.label)}</button>`
+    ).join("") + `</div>`;
+  html += `<div class="seatmap-meta">` +
     `<div><span class="k">列车</span><span class="v">${escapeHtml(layout.label || "")}</span></div>` +
-    `<div><span class="k">游玩日期</span><span class="v">${escapeHtml(data.date || summary.date || "")}</span></div>` +
-    `<div><span class="k">有座</span><span class="v">${summary.seated_tickets != null ? summary.seated_tickets : ""} 人次 / ${summary.seated_people != null ? summary.seated_people : ""} 人</span></div>` +
-    `<div><span class="k">无座</span><span class="v">${summary.nouse_people != null ? summary.nouse_people : 0} 人</span></div>` +
+    `<div><span class="k">游玩日期</span><span class="v">${hasData ? escapeHtml(data.date || summary.date || "") : "—"}</span></div>` +
+    (hasData
+      ? `<div><span class="k">有座</span><span class="v">${summary.seated_tickets != null ? summary.seated_tickets : ""} 人次 / ${summary.seated_people != null ? summary.seated_people : ""} 人</span></div>` +
+        `<div><span class="k">无座</span><span class="v">${summary.nouse_people != null ? summary.nouse_people : 0} 人</span></div>`
+      : `<div><span class="k">状态</span><span class="v">暂无排座结果，当前展示空座位图</span></div>`) +
     `</div>`;
-  html += `<div class="seg-tabs">` + segLabels.map((s, i) =>
-    `<button type="button" class="seg-tab${i === 0 ? " active" : ""}" data-seg="${i}">段${i + 1} ${escapeHtml(s)}</button>`
-  ).join("") + `</div>`;
+  if (hasData) {
+    const segs = (Array.isArray(data.segments) && data.segments.length)
+      ? data.segments : (Array.isArray(summary.segments) ? summary.segments : []);
+    const segLabels = segs.map((s, i) =>
+      (typeof s === "string" && s) ? s : (s && s.pair ? s.pair : `段${i + 1}`));
+    html += `<div class="seg-tabs" id="seg-tabs">` + segLabels.map((s, i) =>
+      `<button type="button" class="seg-tab${i === 0 ? " active" : ""}" data-seg="${i}">段${i + 1} ${escapeHtml(s)}</button>`
+    ).join("") + `</div>`;
+  }
   html += `<div class="seatmap-legend">` +
     `<span class="lg"><i class="swatch occupied"></i>已占座</span>` +
     `<span class="lg"><i class="swatch free"></i>空座</span>` +
@@ -545,17 +569,33 @@ function renderSeatMap(layout, data, summary) {
   html += `<div class="nouse-box" id="nouse-box"></div>`;
   seatmapRoot.innerHTML = html;
 
-  const show = (idx) => {
-    const occ = buildOccupancy(data, idx + 1);
-    document.getElementById("train-layout").innerHTML = renderCars(layout, occ);
-    renderNouse(data, idx + 1);
-    document.querySelectorAll(".seg-tab").forEach((b, i) => b.classList.toggle("active", i === idx));
-  };
-  document.querySelector(".seg-tabs").addEventListener("click", (e) => {
-    const b = e.target.closest(".seg-tab");
-    if (b) show(Number(b.dataset.seg));
-  });
-  show(0);
+  const trainTabs = document.querySelector(".train-tabs");
+  if (trainTabs) {
+    trainTabs.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-train]");
+      if (b) { seatmapTrain = b.dataset.train; loadSeatMap(); }
+    });
+  }
+  if (hasData) {
+    const show = (idx) => {
+      const occ = buildOccupancy(data, idx + 1);
+      document.getElementById("train-layout").innerHTML = renderCars(layout, occ);
+      renderNouse(data, idx + 1);
+      document.querySelectorAll("#seg-tabs .seg-tab").forEach((b, i) => b.classList.toggle("active", i === idx));
+    };
+    const segTabs = document.getElementById("seg-tabs");
+    if (segTabs) {
+      segTabs.addEventListener("click", (e) => {
+        const b = e.target.closest(".seg-tab");
+        if (b) show(Number(b.dataset.seg));
+      });
+    }
+    show(0);
+  } else {
+    document.getElementById("train-layout").innerHTML = renderCars(layout, {});
+    const box = document.getElementById("nouse-box");
+    if (box) box.innerHTML = "";
+  }
 }
 
 // ---------- 玻璃日期选择器（替换原生日历弹窗） ----------
