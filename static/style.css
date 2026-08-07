@@ -680,7 +680,6 @@ form input[type="file"]::file-selector-button {
 .swatch.free { background: var(--input-bg); border: 1px solid var(--input-border); }
 .swatch.table { background: rgba(120, 140, 170, 0.35); }
 .swatch.aisle { background: transparent; border-left: 2px dashed var(--panel-border); }
-.swatch.multi { background: var(--secondary-bg); }
 .train-layout { display: flex; flex-wrap: wrap; gap: 14px; }
 .car-block {
   flex: 1 1 260px;
@@ -722,12 +721,11 @@ form input[type="file"]::file-selector-button {
   color: var(--text-2);
   font-size: 10px;
 }
-.cell-multi {
+.cell-multi-sep {
   grid-column: 1 / -1;
-  background: var(--secondary-bg);
-  color: var(--text-2);
-  font-size: 11px;
-  min-height: 26px;
+  height: 0;
+  border-top: 1px dashed var(--panel-border);
+  margin: 7px 2px;
 }
 .cell-seat {
   background: var(--input-bg);

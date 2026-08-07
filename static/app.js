@@ -479,7 +479,7 @@ function renderCarGrid(car, occ) {
     for (let ci = 0; ci < row.length; ci++) {
       const v = row[ci];
       if (v === "多功能区") {
-        html += `<div class="cell cell-multi">多功能区</div>`;
+        html += `<div class="cell-multi-sep"></div>`;
         continue;
       }
       if (v === "") { html += `<div class="cell cell-empty"></div>`; continue; }
@@ -563,7 +563,6 @@ function renderSeatMap(layout, data, summary, layouts, activeTrain) {
     `<span class="lg"><i class="swatch free"></i>空座</span>` +
     `<span class="lg"><i class="swatch table"></i>桌</span>` +
     `<span class="lg"><i class="swatch aisle"></i>过道</span>` +
-    `<span class="lg"><i class="swatch multi"></i>多功能区</span>` +
     `</div>`;
   html += `<div class="train-layout" id="train-layout"></div>`;
   html += `<div class="nouse-box" id="nouse-box"></div>`;
