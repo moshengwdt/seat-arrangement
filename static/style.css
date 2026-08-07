@@ -633,6 +633,146 @@ form input[type="file"]::file-selector-button {
   background: linear-gradient(150deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.46));
 }
 
+/* ---------- 列车运营情况（座位图） ---------- */
+#seatmap-status { margin: 0 0 14px; font-size: 13px; }
+.seatmap-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  background: var(--panel-grad);
+  box-shadow: var(--shadow), inset 0 1px 0 var(--top-edge);
+  font-size: 13px;
+}
+.seatmap-meta .k { color: var(--text-2); margin-right: 6px; }
+.seg-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.seg-tab {
+  padding: 7px 14px;
+  border: 1px solid var(--btn-border);
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.seg-tab:hover { background: var(--btn-bg-hover); }
+.seg-tab.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+}
+.seatmap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+.seatmap-legend .lg { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.swatch.occupied { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.swatch.free { background: var(--input-bg); border: 1px solid var(--input-border); }
+.swatch.table { background: rgba(120, 140, 170, 0.35); }
+.swatch.aisle { background: transparent; border-left: 2px dashed var(--panel-border); }
+.swatch.multi { background: var(--secondary-bg); }
+.train-layout { display: flex; flex-wrap: wrap; gap: 14px; }
+.car-block {
+  flex: 1 1 260px;
+  max-width: 320px;
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  background: var(--panel-grad);
+  box-shadow: var(--shadow), inset 0 0 0 1px var(--inner-ring), inset 0 1px 0 var(--top-edge);
+}
+.car-block.vip { border-color: var(--accent-2); }
+.car-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.car-name { font-size: 14px; font-weight: 700; }
+.car-type {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  color: var(--text-2);
+}
+.car-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+.cell {
+  min-height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+.cell-empty { background: transparent; }
+.cell-aisle { background: transparent; border-left: 1px dashed var(--panel-border); border-radius: 0; }
+.cell-table {
+  background: rgba(120, 140, 170, 0.18);
+  color: var(--text-2);
+  font-size: 10px;
+}
+.cell-multi {
+  grid-column: 1 / -1;
+  background: var(--secondary-bg);
+  color: var(--text-2);
+  font-size: 11px;
+  min-height: 26px;
+}
+.cell-seat {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text);
+  cursor: default;
+  position: relative;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.cell-seat:hover { transform: translateY(-1px); }
+.cell-seat.occupied {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px var(--focus-ring);
+}
+.cell-seat.occupied[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.96);
+  white-space: nowrap;
+  padding: 6px 10px;
+  border-radius: 9px;
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 20;
+}
+.cell-seat.occupied[data-tip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+.nouse-box { margin-top: 16px; }
+.nouse-box h3 { font-size: 14px; margin: 0 0 8px; }
+.nouse-list { font-size: 13px; color: var(--text-2); line-height: 1.8; }
+
 /* ---------- 移动端自适应 ---------- */
 @media (max-width: 560px) {
   .container { padding: 64px 14px 52px; }
@@ -645,6 +785,9 @@ form input[type="file"]::file-selector-button {
   .theme-toggle { top: 12px; right: 12px; width: 38px; height: 38px; }
   .date-popup { width: calc(100vw - 24px); max-width: 320px; }
   .train-popup { width: calc(100vw - 24px); max-width: 320px; }
+  .car-block { flex-basis: 100%; max-width: none; }
+  .car-grid { gap: 4px; }
+  .cell { min-height: 26px; font-size: 10px; }
 }
 
 /* ---------- 玻璃按钮 ---------- */

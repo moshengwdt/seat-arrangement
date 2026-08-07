@@ -15,7 +15,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="static/style.css?v=20260828" />
+  <link rel="stylesheet" href="static/style.css?v=20260829" />
 </head>
 <body>
   <header class="brand-bar">
@@ -54,6 +54,17 @@
         </span>
         <span class="platform-name">智能排座</span>
         <span class="platform-desc">上传订单数据，自动生成排座方案与短信清单</span>
+        <span class="platform-arrow">→</span>
+      </button>
+      <button type="button" class="platform-card" id="go-seatmap">
+        <span class="platform-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12h4l2-6 4 12 2-6h6" />
+          </svg>
+        </span>
+        <span class="platform-name">列车运营情况</span>
+        <span class="platform-desc">查看排座后的列车座位实时占用情况</span>
         <span class="platform-arrow">→</span>
       </button>
       <button type="button" class="platform-card" disabled aria-disabled="true">
@@ -162,6 +173,14 @@
     <p class="hint" id="origin-info"></p>
   </main>
 
+  <!-- 列车运营情况模块 -->
+  <main class="container seatmap-view" id="view-seatmap">
+    <a class="back-link" href="#/home">← 返回平台首页</a>
+    <h1>列车运营情况</h1>
+    <p class="hint" id="seatmap-status">加载中…</p>
+    <div id="seatmap-root"></div>
+  </main>
+
   <!-- 弹窗（提示 / 人工确认） -->
   <div id="modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-box">
@@ -175,7 +194,7 @@
     </div>
   </div>
 
-  <script src="static/config.js?v=20260828"></script>
-  <script src="static/app.js?v=20260828"></script>
+  <script src="static/config.js?v=20260829"></script>
+  <script src="static/app.js?v=20260829"></script>
 </body>
 </html>
