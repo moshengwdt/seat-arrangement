@@ -476,6 +476,7 @@ function buildOccupancy(data, segNo) {
 function renderCarGrid(car, occ) {
   let html = `<div class="car-grid">`;
   for (const row of (car.grid || [])) {
+    if (!row.some((v) => v !== "")) continue;
     for (let ci = 0; ci < row.length; ci++) {
       const v = row[ci];
       if (v === "多功能区") {
