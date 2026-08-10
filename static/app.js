@@ -811,10 +811,11 @@ function renderSeatMap(layout, data, summary, layouts, activeTrain) {
         `<div><span class="k">无座</span><span class="v">${summary.nouse_people != null ? summary.nouse_people : 0} 人</span></div>`
       : `<div><span class="k">状态</span><span class="v">暂无排座结果，当前展示空座位图</span></div>`) +
     `</div>`;
+  let segLabels = [];
   if (hasData) {
     const segs = (Array.isArray(data.segments) && data.segments.length)
       ? data.segments : (Array.isArray(summary.segments) ? summary.segments : []);
-    const segLabels = segs.map((s, i) =>
+    segLabels = segs.map((s, i) =>
       (typeof s === "string" && s) ? s : (s && s.pair ? s.pair : `段${i + 1}`));
     html += `<label class="sm-field seg-pick"><span>站间段</span><div class="train-wrap sm-seg-wrap">` +
       `<button type="button" class="glass-select" id="seg-select-btn" aria-haspopup="listbox" aria-expanded="false">` +
