@@ -43,6 +43,9 @@ const goSeatmapBtn = document.getElementById("go-seatmap");
 const seatmapStatus = document.getElementById("seatmap-status");
 const seatmapRoot = document.getElementById("seatmap-root");
 const seatmapControls = document.getElementById("seatmap-controls");
+const smProgressEl = document.getElementById("sm-progress");
+const smProgressBar = document.getElementById("sm-progress-bar");
+const smProgressStage = document.getElementById("sm-progress-stage");
 
 function routeView() {
   const h = (location.hash || "#/home").replace(/^#\/?/, "#/");
@@ -506,35 +509,61 @@ function seatmapRouteMeta(route) {
 
 async function showSeatmapSelection(date, route) {
   if (!date || !route) return;
-  if (seatmapStatus) seatmapStatus.textContent = "加载中…";
+  smSetProgress(true, 5, "准备生成…");
+  if (seatmapStatus) seatmapStatus.textContent = "正在生成座位图…";
   if (seatmapRoot) seatmapRoot.innerHTML = "";
-  const base = String(route).replace(/\d+$/, "");
-  if (!seatmapLayouts.some((l) => l.id === base)) {
-    showSeatmapMessage(`「${seatmapRouteMeta(route).label || route}」的座位布局尚未配置，请先提供布局文件。`);
-    return;
-  }
-  const record = seatmapRecords.find((r) => r.date === date && r.route === route) || null;
-  let data = null;
-  let summary = record ? (record.summary || {}) : { date: date };
   try {
-    if (record && record.data_url) {
-      const dr = await fetch(apiUrl(record.data_url));
-      if (dr.ok) data = await dr.json();
+    const base = String(route).replace(/\d+$/, "");
+    if (!seatmapLayouts.some((l) => l.id === base)) {
+      smSetProgress(false);
+      showSeatmapMessage(`「${seatmapRouteMeta(route).label || route}」的座位布局尚未配置，请先提供布局文件。`);
+      return;
     }
-  } catch (e) { /* 数据缺失时展示空图 */ }
-  const layoutResp = await fetch(apiUrl("/api/layout?train=" + encodeURIComponent(base)));
-  if (!layoutResp.ok) {
-    showSeatmapMessage("布局加载失败，请稍后重试。");
-    return;
+    const record = seatmapRecords.find((r) => r.date === date && r.route === route) || null;
+    let data = null;
+    let summary = record ? (record.summary || {}) : { date: date };
+    if (record && record.data_url) {
+      smSetProgress(true, 35, "读取排座记录…");
+      const dr = await fetch(apiUrl(record.data_url));
+      if (dr.ok) {
+        data = await dr.json();
+      } else {
+        showSeatmapMessage(`读取排座记录失败（HTTP ${dr.status}）`);
+      }
+    } else {
+      showSeatmapMessage("该日期暂无排座记录，请先在「智能排座」完成排座。");
+    }
+    smSetProgress(true, 65, "加载列车布局…");
+    const layoutResp = await fetch(apiUrl("/api/layout?train=" + encodeURIComponent(base)));
+    if (!layoutResp.ok) {
+      smSetProgress(false);
+      showSeatmapMessage("布局加载失败，请稍后重试。");
+      return;
+    }
+    const layout = await layoutResp.json();
+    smSetProgress(true, 85, "渲染座位图…");
+    renderSeatMap(layout, data, summary, seatmapLayouts, base);
+    smSetProgress(false, 100, "完成");
+  } catch (err) {
+    smSetProgress(true, 100, "生成失败");
+    showSeatmapMessage("生成失败：" + (err && err.message ? err.message : String(err)));
   }
-  const layout = await layoutResp.json();
-  renderSeatMap(layout, data, summary, seatmapLayouts, base);
 }
 
 function showSeatmapMessage(msg) {
   if (seatmapStatus) seatmapStatus.textContent = msg;
   if (seatmapRoot) seatmapRoot.innerHTML = "";
 }
+
+function smSetProgress(show, pct, stage) {
+  if (smProgressEl) smProgressEl.classList.toggle("hidden", !show);
+  if (smProgressBar) smProgressBar.style.width = (pct || 0) + "%";
+  if (smProgressStage) smProgressStage.textContent = stage || "";
+}
+
+window.addEventListener("error", (e) => {
+  if (seatmapStatus) seatmapStatus.textContent = "发生错误：" + (e && e.message ? e.message : "未知错误");
+});
 
 function initGlassDropdown(opts) {
   const popup = document.createElement("div");
