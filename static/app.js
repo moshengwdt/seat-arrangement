@@ -42,6 +42,7 @@ const goSeatBtn = document.getElementById("go-seat");
 const goSeatmapBtn = document.getElementById("go-seatmap");
 const seatmapStatus = document.getElementById("seatmap-status");
 const seatmapRoot = document.getElementById("seatmap-root");
+const seatmapControls = document.getElementById("seatmap-controls");
 
 function routeView() {
   const h = (location.hash || "#/home").replace(/^#\/?/, "#/");
@@ -403,7 +404,8 @@ if (themeToggle) {
 
 // ---------- 列车运营情况（座位图） ----------
 let seatmapLoading = false;
-let seatmapTrain = null;
+let seatmapRecords = [];
+let seatmapLayouts = [];
 
 async function loadSeatMap() {
   if (!seatmapRoot || seatmapLoading) return;
@@ -411,38 +413,17 @@ async function loadSeatMap() {
   if (seatmapStatus) seatmapStatus.textContent = "加载中…";
   if (seatmapRoot) seatmapRoot.innerHTML = "";
   try {
-    const [layoutsResp, latestResp] = await Promise.all([
+    const [layoutsResp, recordsResp] = await Promise.all([
       fetch(apiUrl("/api/layouts")),
-      fetch(apiUrl("/api/latest")).catch(() => null),
+      fetch(apiUrl("/api/records")),
     ]);
-    const layouts = (layoutsResp.ok ? (await layoutsResp.json()).layouts : []) || [];
-    if (!layouts.length) {
+    seatmapLayouts = (layoutsResp.ok ? (await layoutsResp.json()).layouts : []) || [];
+    seatmapRecords = (recordsResp.ok ? (await recordsResp.json()).records : []) || [];
+    if (!seatmapLayouts.length) {
       showSeatmapMessage("暂无可用列车布局。");
       return;
     }
-    let latest = null;
-    if (latestResp && latestResp.ok) latest = await latestResp.json();
-    let trainId = layouts[0].id;
-    let data = null;
-    let summary = {};
-    if (latest && latest.ok) {
-      const route = String((latest.summary || {}).route || "");
-      const base = route.replace(/\d+$/, "");
-      if (layouts.some((l) => l.id === base)) trainId = base;
-      if (base === trainId) {
-        summary = latest.summary || {};
-        const dr = await fetch(apiUrl(latest.download));
-        if (dr.ok) data = await dr.json();
-      }
-    }
-    if (seatmapTrain && layouts.some((l) => l.id === seatmapTrain)) trainId = seatmapTrain;
-    const layoutResp = await fetch(apiUrl("/api/layout?train=" + encodeURIComponent(trainId)));
-    if (!layoutResp.ok) {
-      showSeatmapMessage("布局加载失败，请稍后重试。");
-      return;
-    }
-    const layout = await layoutResp.json();
-    renderSeatMap(layout, data, summary, layouts, trainId);
+    renderSeatmapControls();
   } catch (err) {
     showSeatmapMessage("座位图加载失败：" + err.message);
   } finally {
@@ -450,9 +431,163 @@ async function loadSeatMap() {
   }
 }
 
+function renderSeatmapControls() {
+  if (!seatmapControls) return;
+  if (!seatmapRecords.length) {
+    seatmapControls.classList.add("hidden");
+    seatmapControls.innerHTML = "";
+    showSeatmapMessage("暂无已生成的排座记录。请先在「智能排座」完成排座。");
+    return;
+  }
+  const bases = [...new Set(seatmapRecords.map((r) => String(r.route).replace(/\d+$/, "")))];
+  seatmapControls.classList.remove("hidden");
+  seatmapControls.innerHTML =
+    `<label class="sm-field"><span>列车</span><div class="train-wrap sm-train-wrap">` +
+      `<button type="button" class="glass-select" id="sm-train-btn" aria-haspopup="listbox" aria-expanded="false">` +
+      `<span id="sm-train-label">请选择列车</span></button>` +
+      `<input type="hidden" id="sm-train-value" value="" /></div></label>` +
+    `<label class="sm-field"><span>开行日期</span><div class="date-wrap sm-date-wrap">` +
+      `<input type="date" id="sm-date-input" />` +
+      `<button type="button" class="date-cal-btn" id="sm-date-cal-btn" aria-label="选择日期">` +
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">` +
+      `<rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>` +
+      `</button></div></label>` +
+    `<button type="button" class="btn sm-generate" id="sm-generate">生成座位图</button>` +
+    `<p class="sm-hint">选择后点击生成；结果已按日期与车辆自动存档，乘务当天可直接查看。</p>`;
+  const trainBtn = document.getElementById("sm-train-btn");
+  const trainLabel = document.getElementById("sm-train-label");
+  const trainValue = document.getElementById("sm-train-value");
+  const dateInput = document.getElementById("sm-date-input");
+  const dateCalBtn = document.getElementById("sm-date-cal-btn");
+  const genBtn = document.getElementById("sm-generate");
+  const datePicker = initGlassDatePicker(dateInput, dateCalBtn);
+  const refreshDates = () => {
+    const base = trainValue.value;
+    const dates = [...new Set(
+      seatmapRecords.filter((r) => String(r.route).replace(/\d+$/, "") === base).map((r) => r.date)
+    )].sort().reverse();
+    datePicker.setAllowed(dates);
+    const n = new Date();
+    const today = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+    dateInput.value = dates.includes(today) ? today : dates[0];
+  };
+  const generate = () => {
+    const base = trainValue.value;
+    const date = dateInput.value;
+    const rec = seatmapRecords.find((r) => r.date === date && String(r.route).replace(/\d+$/, "") === base);
+    if (!rec) {
+      showSeatmapMessage(`${date} 该车暂无排座结果，请先在「智能排座」完成排座。`);
+      return;
+    }
+    showSeatmapSelection(date, rec.route);
+  };
+  genBtn.addEventListener("click", generate);
+  initGlassDropdown({
+    btn: trainBtn,
+    label: trainLabel,
+    value: trainValue,
+    options: bases.map((b) => {
+      const l = (seatmapLayouts.find((x) => x.id === b) || {}).label || b;
+      return { value: b, label: l };
+    }),
+    onPick: () => refreshDates(),
+  });
+  refreshDates();
+  if (seatmapStatus) seatmapStatus.textContent = "请选择列车与开行日期，点击「生成座位图」查看结果。";
+}
+
+function seatmapRouteMeta(route) {
+  const rec = seatmapRecords.find((r) => r.route === route);
+  if (rec) return { label: rec.label || route, train: rec.train || "" };
+  const base = String(route).replace(/\d+$/, "");
+  const l = (seatmapLayouts.find((x) => x.id === base) || {}).label;
+  return { label: l || route, train: "" };
+}
+
+async function showSeatmapSelection(date, route) {
+  if (!date || !route) return;
+  if (seatmapStatus) seatmapStatus.textContent = "加载中…";
+  if (seatmapRoot) seatmapRoot.innerHTML = "";
+  const base = String(route).replace(/\d+$/, "");
+  if (!seatmapLayouts.some((l) => l.id === base)) {
+    showSeatmapMessage(`「${seatmapRouteMeta(route).label || route}」的座位布局尚未配置，请先提供布局文件。`);
+    return;
+  }
+  const record = seatmapRecords.find((r) => r.date === date && r.route === route) || null;
+  let data = null;
+  let summary = record ? (record.summary || {}) : { date: date };
+  try {
+    if (record && record.data_url) {
+      const dr = await fetch(apiUrl(record.data_url));
+      if (dr.ok) data = await dr.json();
+    }
+  } catch (e) { /* 数据缺失时展示空图 */ }
+  const layoutResp = await fetch(apiUrl("/api/layout?train=" + encodeURIComponent(base)));
+  if (!layoutResp.ok) {
+    showSeatmapMessage("布局加载失败，请稍后重试。");
+    return;
+  }
+  const layout = await layoutResp.json();
+  renderSeatMap(layout, data, summary, seatmapLayouts, base);
+}
+
 function showSeatmapMessage(msg) {
   if (seatmapStatus) seatmapStatus.textContent = msg;
   if (seatmapRoot) seatmapRoot.innerHTML = "";
+}
+
+function initGlassDropdown(opts) {
+  const popup = document.createElement("div");
+  popup.className = "train-popup hidden";
+  document.body.appendChild(popup);
+  const render = () => {
+    const cur = (opts.value.value || "").trim();
+    popup.innerHTML = "";
+    for (const o of opts.options) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "train-option" + (o.value === cur ? " selected" : "");
+      b.dataset.value = o.value;
+      b.textContent = o.label;
+      popup.appendChild(b);
+    }
+  };
+  const open = () => {
+    render();
+    const r = opts.btn.getBoundingClientRect();
+    popup.classList.remove("hidden");
+    const pw = popup.offsetWidth || 280;
+    const ph = popup.offsetHeight || 200;
+    const gap = 12;
+    const maxLeft = Math.max(gap, window.innerWidth - pw - gap);
+    popup.style.left = Math.max(gap, Math.min(r.left, maxLeft)) + "px";
+    let top = r.bottom + 8;
+    if (top + ph > window.innerHeight - gap) top = Math.max(gap, r.top - ph - 8);
+    popup.style.top = top + "px";
+    opts.btn.setAttribute("aria-expanded", "true");
+  };
+  const close = () => {
+    popup.classList.add("hidden");
+    opts.btn.setAttribute("aria-expanded", "false");
+  };
+  opts.btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (popup.classList.contains("hidden")) open(); else close();
+  });
+  popup.addEventListener("click", (e) => {
+    const o = e.target.closest(".train-option");
+    if (!o) return;
+    opts.value.value = o.dataset.value;
+    opts.label.textContent = o.textContent;
+    close();
+    if (opts.onPick) opts.onPick(o.dataset.value, o.textContent);
+  });
+  document.addEventListener("click", (e) => {
+    if (!popup.contains(e.target) && e.target !== opts.btn && !e.target.closest(".train-wrap")) close();
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  window.addEventListener("resize", close);
 }
 
 function buildOccupancy(data, segNo) {
@@ -494,7 +629,7 @@ function renderSeatRow(row, occ, car, vipMode) {
       continue;
     }
     if (/^\d+[A-H]$/.test(v)) {
-      const code = `${car.no}车-${v}`;
+      const code = seatCodeFor(car, v);
       const info = occ[code];
       if (info) {
         const tip = `${info.name} · ${info.id}`;
@@ -545,7 +680,7 @@ function renderSeatBlock(rows, rowIndexes, car, occ) {
         continue;
       }
       if (/^\d+[A-H]$/.test(v)) {
-        const code = `${car.no}车-${v}`;
+        const code = seatCodeFor(car, v);
         const info = occ[code];
         if (info) {
           const tip = `${info.name} · ${info.id}`;
@@ -560,6 +695,11 @@ function renderSeatBlock(rows, rowIndexes, car, occ) {
   }
   html.push(`</div>`);
   return html.join("");
+}
+
+function seatCodeFor(car, v) {
+  const s = (car.seats || []).find((x) => x.label === v);
+  return s ? s.code : `${car.no}车-${v}`;
 }
 
 function renderCarGrid(car, occ) {
@@ -606,7 +746,7 @@ function renderCarGrid(car, occ) {
       seats.sort();
       let inner = `<div class="vip-seats">`;
       for (const s of seats) {
-        const code = `${car.no}车-${s}`;
+        const code = seatCodeFor(car, s);
         const info = occ[code];
         if (info) {
           const tip = `${info.name} · ${info.id}`;
@@ -661,15 +801,11 @@ function renderSeatMap(layout, data, summary, layouts, activeTrain) {
   if (seatmapStatus) {
     seatmapStatus.textContent = hasData
       ? `${layout.label || ""} · ${data.date || summary.date || ""}`
-      : `${layout.label || ""} · 暂无排座结果（空座位图）`;
+      : `${layout.label || ""} · ${summary.date || ""} 暂无排座记录（空座位图）`;
   }
-  let html = `<div class="seg-tabs train-tabs">` +
-    (layouts || []).map((l) =>
-      `<button type="button" class="seg-tab${l.id === activeTrain ? " active" : ""}" data-train="${escapeHtml(l.id)}">${escapeHtml(l.label)}</button>`
-    ).join("") + `</div>`;
-  html += `<div class="seatmap-meta">` +
+  let html = `<div class="seatmap-meta">` +
     `<div><span class="k">列车</span><span class="v">${escapeHtml(layout.label || "")}</span></div>` +
-    `<div><span class="k">游玩日期</span><span class="v">${hasData ? escapeHtml(data.date || summary.date || "") : "—"}</span></div>` +
+    `<div><span class="k">游玩日期</span><span class="v">${escapeHtml(data.date || summary.date || "—")}</span></div>` +
     (hasData
       ? `<div><span class="k">有座</span><span class="v">${summary.seated_tickets != null ? summary.seated_tickets : ""} 人次 / ${summary.seated_people != null ? summary.seated_people : ""} 人</span></div>` +
         `<div><span class="k">无座</span><span class="v">${summary.nouse_people != null ? summary.nouse_people : 0} 人</span></div>`
@@ -680,9 +816,10 @@ function renderSeatMap(layout, data, summary, layouts, activeTrain) {
       ? data.segments : (Array.isArray(summary.segments) ? summary.segments : []);
     const segLabels = segs.map((s, i) =>
       (typeof s === "string" && s) ? s : (s && s.pair ? s.pair : `段${i + 1}`));
-    html += `<div class="seg-tabs" id="seg-tabs">` + segLabels.map((s, i) =>
-      `<button type="button" class="seg-tab${i === 0 ? " active" : ""}" data-seg="${i}">段${i + 1} ${escapeHtml(s)}</button>`
-    ).join("") + `</div>`;
+    html += `<label class="sm-field seg-pick"><span>站间段</span><div class="train-wrap sm-seg-wrap">` +
+      `<button type="button" class="glass-select" id="seg-select-btn" aria-haspopup="listbox" aria-expanded="false">` +
+      `<span id="seg-select-label">段1 ${escapeHtml(segLabels[0] || "")}</span></button>` +
+      `<input type="hidden" id="seg-select-value" value="0" /></div></label>`;
   }
   html += `<div class="seatmap-legend">` +
     `<span class="lg"><i class="swatch occupied"></i>已占座</span>` +
@@ -694,25 +831,20 @@ function renderSeatMap(layout, data, summary, layouts, activeTrain) {
   html += `<div class="nouse-box" id="nouse-box"></div>`;
   seatmapRoot.innerHTML = html;
 
-  const trainTabs = document.querySelector(".train-tabs");
-  if (trainTabs) {
-    trainTabs.addEventListener("click", (e) => {
-      const b = e.target.closest("[data-train]");
-      if (b) { seatmapTrain = b.dataset.train; loadSeatMap(); }
-    });
-  }
   if (hasData) {
     const show = (idx) => {
       const occ = buildOccupancy(data, idx + 1);
       document.getElementById("train-layout").innerHTML = renderCars(layout, occ);
       renderNouse(data, idx + 1);
-      document.querySelectorAll("#seg-tabs .seg-tab").forEach((b, i) => b.classList.toggle("active", i === idx));
     };
-    const segTabs = document.getElementById("seg-tabs");
-    if (segTabs) {
-      segTabs.addEventListener("click", (e) => {
-        const b = e.target.closest(".seg-tab");
-        if (b) show(Number(b.dataset.seg));
+    const segBtn = document.getElementById("seg-select-btn");
+    if (segBtn) {
+      initGlassDropdown({
+        btn: segBtn,
+        label: document.getElementById("seg-select-label"),
+        value: document.getElementById("seg-select-value"),
+        options: segLabels.map((s, i) => ({ value: String(i), label: `段${i + 1} ${s}` })),
+        onPick: (v) => show(Number(v)),
       });
     }
     show(0);
@@ -724,13 +856,18 @@ function renderSeatMap(layout, data, summary, layouts, activeTrain) {
 }
 
 // ---------- 玻璃日期选择器（替换原生日历弹窗） ----------
-function initGlassDatePicker(input) {
+function initGlassDatePicker(input, calBtn) {
   if (!input) return;
   const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
   const popup = document.createElement("div");
   popup.className = "date-popup hidden";
   document.body.appendChild(popup);
   let view = null;
+  let allowed = null;
+
+  function setAllowed(dates) {
+    allowed = dates ? new Set(dates) : null;
+  }
 
   function todayIso() {
     const n = new Date();
@@ -751,9 +888,10 @@ function initGlassDatePicker(input) {
     for (let i = 0; i < startDow; i++) html += `<span class="date-cell empty"></span>`;
     for (let d = 1; d <= days; d++) {
       const iso = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-      const cls = ["date-cell", iso === input.value ? "selected" : "", iso === todayIso() ? "today" : ""]
+      const disabled = allowed && !allowed.has(iso);
+      const cls = ["date-cell", disabled ? "disabled" : "", iso === input.value ? "selected" : "", iso === todayIso() ? "today" : ""]
         .filter(Boolean).join(" ");
-      html += `<button type="button" class="${cls}" data-date="${iso}">${d}</button>`;
+      html += `<button type="button" class="${cls}" data-date="${iso}"${disabled ? " disabled" : ""}>${d}</button>`;
     }
     html += `</div>`;
     popup.innerHTML = html;
@@ -797,7 +935,7 @@ function initGlassDatePicker(input) {
 
   input.addEventListener("click", open);
   input.addEventListener("focus", open);
-  const btn = document.getElementById("date-cal-btn");
+  const btn = calBtn || document.getElementById("date-cal-btn");
   if (btn) {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -810,6 +948,7 @@ function initGlassDatePicker(input) {
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
   window.addEventListener("resize", close);
+  return { setAllowed: setAllowed };
 }
 
 initGlassDatePicker(document.querySelector('input[type="date"][name="date"]'));
