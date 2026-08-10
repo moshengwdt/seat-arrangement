@@ -510,6 +510,58 @@ function renderSeatRow(row, occ, car, vipMode) {
   return html;
 }
 
+function renderSeatBlock(rows, rowIndexes, car, occ) {
+  const tables = Array.isArray(car.tables) ? car.tables : [];
+  const covered = new Set();
+  const html = [`<div class="seat-block">`];
+  const first = rowIndexes[0];
+  for (const t of tables) {
+    if (t.r < first || t.r + t.rs > first + rowIndexes.length) continue;
+    if (t.c < 0 || t.c + t.cs > 5) continue;
+    for (let rr = t.r; rr < t.r + t.rs; rr++) {
+      for (let cc = t.c; cc < t.c + t.cs; cc++) covered.add(rr + ":" + cc);
+    }
+    html.push(
+      `<div class="cell cell-table table-block" style="grid-row: ${t.r - first + 1} / span ${t.rs}; grid-column: ${t.c + 1} / span ${t.cs}">桌</div>`
+    );
+  }
+  for (let i = 0; i < rowIndexes.length; i++) {
+    const ri = rowIndexes[i];
+    const row = rows[ri];
+    for (let ci = 0; ci < row.length; ci++) {
+      if (covered.has(ri + ":" + ci)) continue;
+      const v = row[ci];
+      const pos = `grid-row: ${i + 1}; grid-column: ${ci + 1};`;
+      if (v === "" || v == null) {
+        html.push(`<div class="cell cell-empty" style="${pos}"></div>`);
+        continue;
+      }
+      if (v === "过道") {
+        html.push(`<div class="cell cell-aisle" style="${pos}"></div>`);
+        continue;
+      }
+      if (v === "桌") {
+        html.push(`<div class="cell cell-table" style="${pos}">桌</div>`);
+        continue;
+      }
+      if (/^\d+[A-H]$/.test(v)) {
+        const code = `${car.no}车-${v}`;
+        const info = occ[code];
+        if (info) {
+          const tip = `${info.name} · ${info.id}`;
+          html.push(`<div class="cell cell-seat occupied" data-tip="${escapeHtml(tip)}" style="${pos}">${escapeHtml(v)}</div>`);
+        } else {
+          html.push(`<div class="cell cell-seat" style="${pos}">${escapeHtml(v)}</div>`);
+        }
+        continue;
+      }
+      html.push(`<div class="cell cell-empty" style="${pos}"></div>`);
+    }
+  }
+  html.push(`</div>`);
+  return html.join("");
+}
+
 function renderCarGrid(car, occ) {
   const rows = car.grid || [];
   const blocks = [];
@@ -569,7 +621,7 @@ function renderCarGrid(car, occ) {
         `<div class="vip-room">${inner}</div></div>`;
     } else {
       if (prevRows) html += `<div class="row-sep"></div>`;
-      for (const ri of b.rows) html += renderSeatRow(rows[ri], occ, car, false);
+      html += renderSeatBlock(rows, b.rows, car, occ);
     }
     prevRows = true;
   }
