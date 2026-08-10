@@ -430,6 +430,7 @@ h1 {
 form label { display: block; margin-bottom: 14px; font-size: 13px; font-weight: 500; color: var(--text-2); }
 form input[type="file"],
 form input[type="date"],
+.seatmap-controls input[type="date"],
 form select {
   display: block;
   width: 100%;
@@ -447,6 +448,7 @@ form select {
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, color 0.35s;
 }
 form input:focus,
+.seatmap-controls input:focus,
 form select:focus {
   background: var(--input-bg-focus);
   border-color: var(--accent);
@@ -620,6 +622,7 @@ form input[type="file"]::file-selector-button {
   font-weight: 600;
 }
 .date-cell.empty { pointer-events: none; }
+.date-cell.disabled { opacity: 0.35; pointer-events: none; }
 
 /* 下拉/日期弹层：适度透光 + 背景模糊，保持玻璃感而非实心面板 */
 .train-popup,
@@ -638,9 +641,9 @@ form input[type="file"]::file-selector-button {
 .seatmap-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 22px;
-  margin-bottom: 16px;
-  padding: 14px 18px;
+  gap: 8px 14px;
+  margin-bottom: 10px;
+  padding: 10px 14px;
   border: 1px solid var(--panel-border);
   border-radius: 18px;
   background: var(--panel-grad);
@@ -648,9 +651,9 @@ form input[type="file"]::file-selector-button {
   font-size: 13px;
 }
 .seatmap-meta .k { color: var(--text-2); margin-right: 6px; }
-.seg-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.seg-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .seg-tab {
-  padding: 7px 14px;
+  padding: 5px 11px;
   border: 1px solid var(--btn-border);
   border-radius: 999px;
   background: var(--btn-bg);
@@ -669,33 +672,50 @@ form input[type="file"]::file-selector-button {
 .seatmap-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
-  margin-bottom: 16px;
-  font-size: 12px;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 11px;
   color: var(--text-2);
 }
 .seatmap-legend .lg { display: inline-flex; align-items: center; gap: 6px; }
-.swatch { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
 .swatch.occupied { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
 .swatch.free { background: var(--input-bg); border: 1px solid var(--input-border); }
 .swatch.table { background: rgba(120, 140, 170, 0.35); }
 .swatch.aisle { background: transparent; border-left: 2px dashed var(--panel-border); }
-.train-layout { display: flex; flex-wrap: wrap; gap: 14px; }
+.train-layout { display: flex; flex-wrap: wrap; gap: 10px; }
 .car-block {
-  flex: 1 1 260px;
-  max-width: 320px;
-  padding: 14px;
+  flex: 0 1 auto;
+  max-width: none;
+  padding: 10px;
   border: 1px solid var(--panel-border);
-  border-radius: 20px;
+  border-radius: 16px;
   background: var(--panel-grad);
   box-shadow: var(--shadow), inset 0 0 0 1px var(--inner-ring), inset 0 1px 0 var(--top-edge);
 }
 .car-block.vip { border-color: var(--accent-2); }
-.car-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.car-name { font-size: 14px; font-weight: 700; }
+.seatmap-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 16px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background: var(--panel-grad);
+}
+.seatmap-controls.hidden { display: none; }
+.sm-hint { flex-basis: 100%; font-size: 12px; color: var(--text-2); margin: 2px 0 0; }
+.sm-field.seg-pick { margin-bottom: 10px; }
+.sm-field { display: flex; flex-direction: column; align-items: stretch; gap: 6px; font-size: 13px; color: var(--text-2); font-weight: 500; }
+.sm-field .train-wrap, .sm-field .date-wrap { margin-top: 0; width: 220px; }
+.sm-generate { margin-top: 0; }
+.car-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.car-name { font-size: 12px; font-weight: 700; }
 .car-type {
-  font-size: 11px;
-  padding: 3px 10px;
+  font-size: 10px;
+  padding: 2px 8px;
   border-radius: 999px;
   background: var(--chip-bg);
   border: 1px solid var(--chip-border);
@@ -704,49 +724,50 @@ form input[type="file"]::file-selector-button {
 .car-grid {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 3px;
+  align-items: flex-start;
 }
 .seat-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(5, 34px);
+  gap: 3px;
 }
 .seat-block {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(5, 34px);
+  gap: 3px;
 }
 .row-sep {
   height: 0;
   border-top: 1px dashed var(--panel-border);
-  margin: 3px 2px 1px;
+  margin: 2px 1px 0;
 }
 .vip-room {
   grid-column: 2 / -1;
   border: 1px solid var(--accent-2);
-  border-radius: 12px;
-  padding: 9px 8px 7px;
+  border-radius: 10px;
+  padding: 6px;
   background: var(--td-bg);
 }
 .cell-room {
   background: var(--chip-bg);
   border: 1px solid var(--chip-border);
   color: var(--accent);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 .vip-seats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
+  gap: 3px;
 }
 .cell {
-  min-height: 30px;
-  border-radius: 8px;
+  min-height: 20px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 9px;
 }
 .cell-empty { background: transparent; }
 .cell-aisle { background: transparent; border-left: 1px dashed var(--panel-border); border-radius: 0; }
@@ -756,14 +777,14 @@ form input[type="file"]::file-selector-button {
   font-size: 10px;
 }
 .cell-table.table-block {
-  border-radius: 12px;
-  letter-spacing: 3px;
+  border-radius: 8px;
+  letter-spacing: 2px;
 }
 .cell-multi-sep {
   grid-column: 1 / -1;
   height: 0;
   border-top: 1px dashed var(--panel-border);
-  margin: 7px 2px;
+  margin: 4px 1px;
 }
 .cell-seat {
   background: var(--input-bg);
@@ -822,9 +843,10 @@ form input[type="file"]::file-selector-button {
   .date-popup { width: calc(100vw - 24px); max-width: 320px; }
   .train-popup { width: calc(100vw - 24px); max-width: 320px; }
   .car-block { flex-basis: 100%; max-width: none; }
-  .seat-row { gap: 4px; }
-  .seat-block { gap: 4px; }
-  .cell { min-height: 26px; font-size: 10px; }
+  .sm-field .train-wrap, .sm-field .date-wrap { width: 100%; }
+  .seat-row { grid-template-columns: repeat(5, 28px); gap: 3px; }
+  .seat-block { grid-template-columns: repeat(5, 28px); gap: 3px; }
+  .cell { min-height: 18px; font-size: 9px; }
 }
 
 /* ---------- 玻璃按钮 ---------- */
