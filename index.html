@@ -15,7 +15,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="static/style.css?v=20260812" />
+  <link rel="stylesheet" href="static/style.css?v=20260813" />
 </head>
 <body>
   <header class="brand-bar">
@@ -179,6 +179,13 @@
     <h1>列车运营情况</h1>
     <p class="hint" id="seatmap-status">加载中…</p>
     <div id="seatmap-controls" class="seatmap-controls hidden"></div>
+    <section id="sm-progress" class="hidden" aria-live="polite">
+      <h3>座位图生成进度</h3>
+      <div class="progress-track">
+        <div id="sm-progress-bar" class="progress-bar" style="width: 0%"></div>
+      </div>
+      <p id="sm-progress-stage" class="stage">准备中…</p>
+    </section>
     <div id="seatmap-root"></div>
   </main>
 
@@ -195,7 +202,7 @@
     </div>
   </div>
 
-  <script src="static/config.js?v=20260812"></script>
-  <script src="static/app.js?v=20260812"></script>
+  <script src="static/config.js?v=20260813"></script>
+  <script src="static/app.js?v=20260813"></script>
 </body>
 </html>
