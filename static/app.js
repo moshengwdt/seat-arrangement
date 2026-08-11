@@ -24,6 +24,12 @@ const smsDownloadBtn = document.getElementById("sms-download-btn");
 const smsDetailDownloadBtn = document.getElementById("sms-detail-download-btn");
 const smsManifestDownloadBtn = document.getElementById("sms-manifest-download-btn");
 
+const seatQueryForm = document.getElementById("seatquery-form");
+const sqErrorBox = document.getElementById("sq-error");
+const sqSubmitBtn = document.getElementById("sq-submit-btn");
+const sqResult = document.getElementById("sq-result");
+const sqStatus = document.getElementById("sq-status");
+
 const modal = document.getElementById("modal");
 const modalTitle = document.getElementById("modal-title");
 const modalMessage = document.getElementById("modal-message");
@@ -34,12 +40,14 @@ const modalConfirm = document.getElementById("modal-confirm");
 const originInfo = document.getElementById("origin-info");
 if (originInfo) originInfo.textContent = "页面来源：" + location.origin;
 
-// ---------- 视图路由：平台首页 / 排座模块 ----------
+// ---------- 视图路由：平台首页 / 排座 / 座位图 / 座位查询 ----------
 const viewHome = document.getElementById("view-home");
 const viewSeat = document.getElementById("view-seat");
 const viewSeatmap = document.getElementById("view-seatmap");
+const viewSeatquery = document.getElementById("view-seatquery");
 const goSeatBtn = document.getElementById("go-seat");
 const goSeatmapBtn = document.getElementById("go-seatmap");
+const goSeatQueryBtn = document.getElementById("go-seatquery");
 const seatmapStatus = document.getElementById("seatmap-status");
 const seatmapRoot = document.getElementById("seatmap-root");
 const seatmapControls = document.getElementById("seatmap-controls");
@@ -51,19 +59,26 @@ function routeView() {
   const h = (location.hash || "#/home").replace(/^#\/?/, "#/");
   const showSeat = h === "#/seat";
   const showSeatmap = h === "#/seatmap";
-  if (viewHome) viewHome.classList.toggle("hidden", showSeat || showSeatmap);
+  const showSeatquery = h === "#/seatquery";
+  if (viewHome) viewHome.classList.toggle("hidden", showSeat || showSeatmap || showSeatquery);
   if (viewSeat) viewSeat.classList.toggle("hidden", !showSeat);
   if (viewSeatmap) viewSeatmap.classList.toggle("hidden", !showSeatmap);
+  if (viewSeatquery) viewSeatquery.classList.toggle("hidden", !showSeatquery);
   document.title = showSeat ? "智能排座 · 观光列车智能运营中台"
     : showSeatmap ? "列车运营情况 · 观光列车智能运营中台"
+    : showSeatquery ? "座位查询 · 观光列车智能运营中台"
     : "观光列车智能运营中台";
   if (showSeatmap) loadSeatMap();
+  if (showSeatquery) loadSeatQuery();
 }
 if (goSeatBtn) {
   goSeatBtn.addEventListener("click", () => { location.hash = "#/seat"; });
 }
 if (goSeatmapBtn) {
   goSeatmapBtn.addEventListener("click", () => { location.hash = "#/seatmap"; });
+}
+if (goSeatQueryBtn) {
+  goSeatQueryBtn.addEventListener("click", () => { location.hash = "#/seatquery"; });
 }
 window.addEventListener("hashchange", routeView);
 routeView();
@@ -979,6 +994,127 @@ function initGlassDatePicker(input, calBtn) {
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
   window.addEventListener("resize", close);
   return { setAllowed: setAllowed };
+}
+
+// ---------- 座位查询模块 ----------
+let seatQueryLoaded = false;
+let sqRecords = [];
+let sqLayouts = [];
+
+async function loadSeatQuery() {
+  if (!seatQueryForm || seatQueryLoaded) return;
+  seatQueryLoaded = true;
+  if (sqStatus) sqStatus.textContent = "加载中…";
+  try {
+    const [layoutsResp, recordsResp] = await Promise.all([
+      fetch(apiUrl("/api/layouts")),
+      fetch(apiUrl("/api/records")),
+    ]);
+    sqLayouts = (layoutsResp.ok ? (await layoutsResp.json()).layouts : []) || [];
+    sqRecords = (recordsResp.ok ? (await recordsResp.json()).records : []) || [];
+    if (!sqRecords.length) {
+      if (sqStatus) sqStatus.textContent = "暂无已生成的排座记录，请先在「智能排座」完成排座后再查询。";
+      return;
+    }
+    const bases = [...new Set(sqRecords.map((r) => String(r.route).replace(/\d+$/, "")))];
+    const trainBtn = document.getElementById("sq-train-btn");
+    const trainLabel = document.getElementById("sq-train-label");
+    const trainValue = document.getElementById("sq-train-value");
+    const dateInput = document.getElementById("sq-date-input");
+    const dateCalBtn = document.getElementById("sq-date-cal-btn");
+    const datePicker = initGlassDatePicker(dateInput, dateCalBtn);
+    const refreshDates = () => {
+      const base = trainValue.value;
+      const dates = [...new Set(
+        sqRecords
+          .filter((r) => String(r.route).replace(/\d+$/, "") === base)
+          .map((r) => r.date)
+      )].sort().reverse();
+      datePicker.setAllowed(dates);
+      if (!dates.includes(dateInput.value)) {
+        dateInput.value = dates[0] || "";
+        dateInput.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      if (sqStatus) sqStatus.textContent = "选择车辆与出行日期后，输入姓名和身份证后四位即可查询。";
+    };
+    initGlassDropdown({
+      btn: trainBtn,
+      label: trainLabel,
+      value: trainValue,
+      options: bases.map((b) => {
+        const l = (sqLayouts.find((x) => x.id === b) || {}).label || b;
+        return { value: b, label: l };
+      }),
+      onPick: () => refreshDates(),
+    });
+    refreshDates();
+  } catch (err) {
+    seatQueryLoaded = false;
+    if (sqStatus) sqStatus.textContent = "座位查询加载失败：" + (err && err.message ? err.message : String(err));
+  }
+}
+
+function renderSeatQueryResult(data) {
+  const list = data.results || [];
+  const meta =
+    `<div class="sq-result-meta">` +
+    `<div><span class="k">车辆</span><span class="v">${escapeHtml(data.train || data.label || "")}</span></div>` +
+    `<div><span class="k">出行日期</span><span class="v">${escapeHtml(data.date || "")}</span></div>` +
+    `<div><span class="k">交路</span><span class="v">${escapeHtml(data.label || "")}</span></div>` +
+    `</div>`;
+  const cards = list.map((r) => {
+    const segs = (r.segments || []).map((s) => s.pair).filter(Boolean).join("、") || "全程";
+    return `<div class="sq-card">` +
+      `<div class="sq-name">${escapeHtml(r.name)}</div>` +
+      `<div class="sq-grid">` +
+        `<div><span class="k">行程</span><span class="v">${escapeHtml(segs)}</span></div>` +
+        (r.has_seat
+          ? `<div><span class="k">车厢</span><span class="v">${escapeHtml(r.car || "—")}</span></div>` +
+            `<div><span class="k">座位号</span><span class="v">${escapeHtml(r.seat || "—")}</span></div>`
+          : `<div><span class="k">座位</span><span class="v">无座</span></div>`) +
+        (r.ticket ? `<div><span class="k">票号</span><span class="v">${escapeHtml(r.ticket)}</span></div>` : "") +
+      `</div>` +
+    `</div>`;
+  }).join("");
+  sqResult.innerHTML = `<h3>查询结果（${list.length} 条）</h3>${meta}${cards}`;
+  sqResult.classList.remove("hidden");
+}
+
+if (seatQueryForm) {
+  seatQueryForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearError(sqErrorBox);
+    const train = document.getElementById("sq-train-value").value.trim();
+    const date = document.getElementById("sq-date-input").value.trim();
+    const name = document.getElementById("sq-name").value.trim();
+    const id4 = document.getElementById("sq-id4").value.trim();
+    if (!train) { showError(sqErrorBox, "请选择车辆"); return; }
+    if (!date) { showError(sqErrorBox, "请选择出行日期"); return; }
+    if (!name) { showError(sqErrorBox, "请输入姓名"); return; }
+    if (!/^[0-9A-Za-z]{4}$/.test(id4)) {
+      showError(sqErrorBox, "请输入身份证号后四位（4 位数字或字母）");
+      return;
+    }
+    sqResult.classList.add("hidden");
+    sqResult.innerHTML = "";
+    sqSubmitBtn.disabled = true;
+    sqSubmitBtn.textContent = "查询中…";
+    try {
+      const q = new URLSearchParams({ train, date, name, id4 });
+      const resp = await fetch(apiUrl("/api/query?" + q.toString()));
+      const data = await resp.json();
+      if (!data.ok) {
+        showError(sqErrorBox, data.error || "查询失败");
+        return;
+      }
+      renderSeatQueryResult(data);
+    } catch (err) {
+      showError(sqErrorBox, "网络错误：" + err.message);
+    } finally {
+      sqSubmitBtn.disabled = false;
+      sqSubmitBtn.textContent = "查询座位";
+    }
+  });
 }
 
 initGlassDatePicker(document.querySelector('input[type="date"][name="date"]'));

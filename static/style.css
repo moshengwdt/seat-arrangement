@@ -983,3 +983,57 @@ tbody tr:last-child td { border-bottom: 0; }
 @media (prefers-reduced-motion: reduce) {
   body::before, body::after, .progress-bar, .panel, .platform-card { animation: none; }
 }
+/* ---------- 座位查询模块 ---------- */
+.seatquery-view form input[type="text"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 7px;
+  padding: 12px 14px;
+  border: 1px solid var(--input-border);
+  border-radius: 14px;
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.seatquery-view form input[type="text"]:focus {
+  background: var(--input-bg-focus);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+.sq-train-wrap, .sq-date-wrap { margin-top: 7px; }
+.sq-result-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.sq-result-meta > div {
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  border-radius: 13px;
+  padding: 9px 12px;
+}
+.sq-result-meta .k { display: block; font-size: 11px; color: var(--text-2); }
+.sq-result-meta .v { font-size: 14px; font-weight: 600; }
+.sq-card {
+  background: var(--panel-grad);
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.sq-name { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.sq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px 12px;
+}
+.sq-grid .k { display: block; font-size: 11px; color: var(--text-2); margin-bottom: 2px; }
+.sq-grid .v { font-size: 14px; font-weight: 600; word-break: break-all; }
