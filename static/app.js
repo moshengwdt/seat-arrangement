@@ -23,6 +23,12 @@ const smsMeta = document.getElementById("sms-meta");
 const smsDownloadBtn = document.getElementById("sms-download-btn");
 const smsDetailDownloadBtn = document.getElementById("sms-detail-download-btn");
 const smsManifestDownloadBtn = document.getElementById("sms-manifest-download-btn");
+const smsMode = document.getElementById("sms-mode");
+const smsPreviewBtn = document.getElementById("sms-preview-btn");
+const smsSendBtn = document.getElementById("sms-send-btn");
+const smsSendResult = document.getElementById("sms-send-result");
+const smsSendMeta = document.getElementById("sms-send-meta");
+const smsSendError = document.getElementById("sms-send-error");
 
 const seatQueryForm = document.getElementById("seatquery-form");
 const sqErrorBox = document.getElementById("sq-error");
@@ -39,6 +45,9 @@ const modalConfirm = document.getElementById("modal-confirm");
 
 const originInfo = document.getElementById("origin-info");
 if (originInfo) originInfo.textContent = "页面来源：" + location.origin;
+
+// 对客公开模式：仅保留座位查询，隐藏管理模块
+const GUEST_MODE = !!(window.SEAT_CONFIG && window.SEAT_CONFIG.guestMode);
 
 // ---------- 视图路由：平台首页 / 排座 / 座位图 / 座位查询 ----------
 const viewHome = document.getElementById("view-home");
@@ -57,6 +66,10 @@ const smProgressStage = document.getElementById("sm-progress-stage");
 
 function routeView() {
   const h = (location.hash || "#/home").replace(/^#\/?/, "#/");
+  if (GUEST_MODE && (h === "#/seat" || h === "#/seatmap")) {
+    location.hash = "#/home";
+    return;
+  }
   const showSeat = h === "#/seat";
   const showSeatmap = h === "#/seatmap";
   const showSeatquery = h === "#/seatquery";
@@ -79,6 +92,10 @@ if (goSeatmapBtn) {
 }
 if (goSeatQueryBtn) {
   goSeatQueryBtn.addEventListener("click", () => { location.hash = "#/seatquery"; });
+}
+if (GUEST_MODE) {
+  if (goSeatBtn) goSeatBtn.classList.add("hidden");
+  if (goSeatmapBtn) goSeatmapBtn.classList.add("hidden");
 }
 window.addEventListener("hashchange", routeView);
 routeView();
@@ -398,6 +415,92 @@ function renderSmsSummary(s) {
   if (s.sms_manifest_download) enableLink(smsManifestDownloadBtn, apiUrl(s.sms_manifest_download));
   smsProgress.classList.add("hidden");
   smsSummary.classList.remove("hidden");
+}
+
+// ---------- 阿里云短信发送 ----------
+async function pollSendJob(job) {
+  while (true) {
+    await sleep(700);
+    const r = await fetch(apiUrl(`/api/job/${job}`));
+    const st = await r.json();
+    if (!st.ok) {
+      showError(smsSendError, st.error || "查询任务失败");
+      return null;
+    }
+    setProgress(smsProgressBar, smsProgressStage, st.pct, st.stage);
+    if (st.status === "done") return st.summary || {};
+    if (st.status === "error") {
+      showError(smsSendError, st.error || "发送任务失败");
+      return null;
+    }
+  }
+}
+
+async function sendSmsRequest(dryRun) {
+  clearError(smsSendError);
+  smsSendResult.classList.add("hidden");
+  smsSendMeta.innerHTML = "";
+  smsProgress.classList.remove("hidden");
+  setProgress(smsProgressBar, smsProgressStage, 0, dryRun ? "开始预览…" : "开始发送…");
+  const btn = dryRun ? smsPreviewBtn : smsSendBtn;
+  btn.disabled = true;
+  btn.textContent = dryRun ? "预览中…" : "发送中…";
+  try {
+    const resp = await fetch(apiUrl("/api/sms/send"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: smsMode.value, dry_run: dryRun }),
+    });
+    const data = await resp.json();
+    if (!data.ok) {
+      if (data.error_type === "sms_config") {
+        showModal("短信配置未就绪", data.error || "请先在服务器配置阿里云短信参数");
+      } else {
+        showError(smsSendError, data.error || "请求失败");
+      }
+      smsProgress.classList.add("hidden");
+      return;
+    }
+    const summary = await pollSendJob(data.job);
+    if (summary) renderSmsSendResult(summary, dryRun);
+    else smsProgress.classList.add("hidden");
+  } catch (err) {
+    showError(smsSendError, "网络错误：" + err.message);
+    smsProgress.classList.add("hidden");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = dryRun ? "预览短信" : "发送短信";
+  }
+}
+
+function renderSmsSendResult(s, dryRun) {
+  const modeLabel = s.mode === "order" ? "每单一单" : "每人一条";
+  const items = [
+    ["模式", dryRun ? "预览（未实际发送）" : modeLabel],
+    ["总条数", s.total],
+    ["成功", s.sent],
+    ["失败", s.failed],
+    ["跳过", s.skipped],
+    ["缺手机号订单", s.no_phone],
+  ];
+  smsSendMeta.innerHTML = items
+    .map(([k, v]) => `<div><span class="k">${escapeHtml(k)}</span><span class="v">${escapeHtml(v)}</span></div>`)
+    .join("");
+  if (!dryRun && s.failed > 0) {
+    smsSendError.textContent = "部分短信发送失败，可在服务器端查看 sms_send.db 后重试";
+    smsSendError.classList.remove("hidden");
+  }
+  smsProgress.classList.add("hidden");
+  smsSendResult.classList.remove("hidden");
+}
+
+if (smsPreviewBtn) {
+  smsPreviewBtn.addEventListener("click", () => sendSmsRequest(true));
+}
+if (smsSendBtn) {
+  smsSendBtn.addEventListener("click", () => {
+    showConfirm("发送短信", "确认调用阿里云短信接口发送？正式发送将产生短信费用。", () => sendSmsRequest(false));
+  });
 }
 
 // ---------- 动态毛玻璃光效（跟随鼠标） ----------
@@ -1006,17 +1109,43 @@ async function loadSeatQuery() {
   seatQueryLoaded = true;
   if (sqStatus) sqStatus.textContent = "加载中…";
   try {
-    const [layoutsResp, recordsResp] = await Promise.all([
-      fetch(apiUrl("/api/layouts")),
-      fetch(apiUrl("/api/records")),
-    ]);
-    sqLayouts = (layoutsResp.ok ? (await layoutsResp.json()).layouts : []) || [];
-    sqRecords = (recordsResp.ok ? (await recordsResp.json()).records : []) || [];
-    if (!sqRecords.length) {
-      if (sqStatus) sqStatus.textContent = "暂无已生成的排座记录，请先在「智能排座」完成排座后再查询。";
-      return;
+    let options = [];
+    if (GUEST_MODE) {
+      const resp = await fetch(apiUrl("/api/query/options"));
+      const d = resp.ok ? await resp.json() : null;
+      options = (d && d.ok && Array.isArray(d.trains)) ? d.trains : [];
+      sqLayouts = [];
+      sqRecords = [];
+      if (!options.length) {
+        if (sqStatus) sqStatus.textContent = "暂无可查询的排座记录。";
+        return;
+      }
+    } else {
+      const [layoutsResp, recordsResp] = await Promise.all([
+        fetch(apiUrl("/api/layouts")),
+        fetch(apiUrl("/api/records")),
+      ]);
+      sqLayouts = (layoutsResp.ok ? (await layoutsResp.json()).layouts : []) || [];
+      sqRecords = (recordsResp.ok ? (await recordsResp.json()).records : []) || [];
+      if (!sqRecords.length) {
+        if (sqStatus) sqStatus.textContent = "暂无已生成的排座记录，请先在「智能排座」完成排座后再查询。";
+        return;
+      }
+      const bases = [...new Set(sqRecords.map((r) => String(r.route).replace(/\d+$/, "")))];
+      options = bases.map((b) => {
+        const l = (sqLayouts.find((x) => x.id === b) || {}).label || b;
+        return {
+          id: b,
+          name: l,
+          label: l,
+          dates: [...new Set(
+            sqRecords
+              .filter((r) => String(r.route).replace(/\d+$/, "") === b)
+              .map((r) => r.date)
+          )].sort().reverse(),
+        };
+      });
     }
-    const bases = [...new Set(sqRecords.map((r) => String(r.route).replace(/\d+$/, "")))];
     const trainBtn = document.getElementById("sq-train-btn");
     const trainLabel = document.getElementById("sq-train-label");
     const trainValue = document.getElementById("sq-train-value");
@@ -1025,11 +1154,8 @@ async function loadSeatQuery() {
     const datePicker = initGlassDatePicker(dateInput, dateCalBtn);
     const refreshDates = () => {
       const base = trainValue.value;
-      const dates = [...new Set(
-        sqRecords
-          .filter((r) => String(r.route).replace(/\d+$/, "") === base)
-          .map((r) => r.date)
-      )].sort().reverse();
+      const opt = options.find((o) => o.id === base);
+      const dates = (opt && Array.isArray(opt.dates)) ? opt.dates : [];
       datePicker.setAllowed(dates);
       if (!dates.includes(dateInput.value)) {
         dateInput.value = dates[0] || "";
@@ -1041,10 +1167,7 @@ async function loadSeatQuery() {
       btn: trainBtn,
       label: trainLabel,
       value: trainValue,
-      options: bases.map((b) => {
-        const l = (sqLayouts.find((x) => x.id === b) || {}).label || b;
-        return { value: b, label: l };
-      }),
+      options: options.map((o) => ({ value: o.id, label: o.label || o.name || o.id })),
       onPick: () => refreshDates(),
     });
     refreshDates();

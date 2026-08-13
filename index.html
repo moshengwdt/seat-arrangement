@@ -15,7 +15,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="static/style.css?v=20260813b" />
+  <link rel="stylesheet" href="static/style.css?v=20260813c" />
 </head>
 <body>
   <header class="brand-bar">
@@ -149,6 +149,18 @@
       <p class="hint">基于最近一次排座结果生成短信清单（联系人信息已随排座阶段获取，无需再次上传订单表）。</p>
       <form id="sms-form">
         <button type="submit" class="btn" id="sms-submit-btn">生成短信清单</button>
+        <label>
+          发送方式
+          <select id="sms-mode">
+            <option value="person">每人一条（推荐）</option>
+            <option value="order">每单一单</option>
+          </select>
+        </label>
+        <div class="sms-send-actions">
+          <button type="button" class="btn secondary" id="sms-preview-btn">预览短信</button>
+          <button type="button" class="btn" id="sms-send-btn">发送短信</button>
+        </div>
+        <p class="hint">预览不会实际发送；正式发送将调用阿里云短信接口并产生费用，请确认签名与模板已审核通过。</p>
         <p id="sms-error" class="error hidden"></p>
       </form>
 
@@ -166,6 +178,12 @@
         <a id="sms-download-btn" class="btn disabled" href="#" download aria-disabled="true">下载短信内容</a>
         <a id="sms-detail-download-btn" class="btn disabled" href="#" download aria-disabled="true">下载短信明细</a>
         <a id="sms-manifest-download-btn" class="btn disabled" href="#" download aria-disabled="true">下载发送清单</a>
+      </section>
+
+      <section id="sms-send-result" class="hidden" aria-live="polite">
+        <h3>短信发送结果</h3>
+        <div id="sms-send-meta" class="meta"></div>
+        <p id="sms-send-error" class="error hidden"></p>
       </section>
     </section>
 
@@ -249,7 +267,7 @@
     </div>
   </div>
 
-  <script src="static/config.js?v=20260813b"></script>
-  <script src="static/app.js?v=20260813b"></script>
+  <script src="static/config.js?v=20260813c"></script>
+  <script src="static/app.js?v=20260813c"></script>
 </body>
 </html>

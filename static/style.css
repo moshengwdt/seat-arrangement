@@ -706,6 +706,7 @@ form input[type="file"]::file-selector-button {
   background: var(--panel-grad);
 }
 .seatmap-controls.hidden { display: none; }
+#sm-progress { margin-bottom: 12px; }
 .sm-hint { flex-basis: 100%; font-size: 12px; color: var(--text-2); margin: 2px 0 0; }
 .sm-field.seg-pick { margin-bottom: 10px; }
 .sm-field { display: flex; flex-direction: column; align-items: stretch; gap: 6px; font-size: 13px; color: var(--text-2); font-weight: 500; }
@@ -983,6 +984,7 @@ tbody tr:last-child td { border-bottom: 0; }
 @media (prefers-reduced-motion: reduce) {
   body::before, body::after, .progress-bar, .panel, .platform-card { animation: none; }
 }
+
 /* ---------- 座位查询模块 ---------- */
 .seatquery-view form input[type="text"] {
   display: block;
@@ -1037,3 +1039,6 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .sq-grid .k { display: block; font-size: 11px; color: var(--text-2); margin-bottom: 2px; }
 .sq-grid .v { font-size: 14px; font-weight: 600; word-break: break-all; }
+
+/* ---------- 阿里云短信发送 ---------- */
+.sms-send-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
