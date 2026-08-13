@@ -66,8 +66,14 @@ const smProgressStage = document.getElementById("sm-progress-stage");
 
 function routeView() {
   const h = (location.hash || "#/home").replace(/^#\/?/, "#/");
-  if (GUEST_MODE && (h === "#/seat" || h === "#/seatmap")) {
-    location.hash = "#/home";
+  if (GUEST_MODE) {
+    if (viewHome) viewHome.classList.add("hidden");
+    if (viewSeat) viewSeat.classList.add("hidden");
+    if (viewSeatmap) viewSeatmap.classList.add("hidden");
+    if (viewSeatquery) viewSeatquery.classList.remove("hidden");
+    document.title = "座位查询 · 观光列车智能运营中台";
+    if (h === "#/seatquery") loadSeatQuery();
+    if (h !== "#/seatquery") location.hash = "#/seatquery";
     return;
   }
   const showSeat = h === "#/seat";
@@ -96,6 +102,8 @@ if (goSeatQueryBtn) {
 if (GUEST_MODE) {
   if (goSeatBtn) goSeatBtn.classList.add("hidden");
   if (goSeatmapBtn) goSeatmapBtn.classList.add("hidden");
+  const backLink = document.getElementById("sq-back-link");
+  if (backLink) backLink.classList.add("hidden");
 }
 window.addEventListener("hashchange", routeView);
 routeView();
