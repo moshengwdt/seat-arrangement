@@ -46,8 +46,11 @@ const modalConfirm = document.getElementById("modal-confirm");
 const originInfo = document.getElementById("origin-info");
 if (originInfo) originInfo.textContent = "页面来源：" + location.origin;
 
-// 对客公开模式：仅保留座位查询，隐藏管理模块
-const GUEST_MODE = !!(window.SEAT_CONFIG && window.SEAT_CONFIG.guestMode);
+// 角色：guest=游客（仅座位查询）；ops=运营（排座+短信+座位图）；ops-admin 暂未启用
+const ROLE = (window.SEAT_CONFIG && window.SEAT_CONFIG.role)
+  || (window.SEAT_CONFIG && window.SEAT_CONFIG.guestMode ? "guest" : "ops");
+const GUEST_MODE = ROLE === "guest";
+const OPS_MODE = ROLE === "ops";
 
 // ---------- 视图路由：平台首页 / 排座 / 座位图 / 座位查询 ----------
 const viewHome = document.getElementById("view-home");
@@ -66,6 +69,10 @@ const smProgressStage = document.getElementById("sm-progress-stage");
 
 function routeView() {
   const h = (location.hash || "#/home").replace(/^#\/?/, "#/");
+  if (OPS_MODE && h === "#/seatquery") {
+    location.hash = "#/home";
+    return;
+  }
   if (GUEST_MODE) {
     if (viewHome) viewHome.classList.add("hidden");
     if (viewSeat) viewSeat.classList.add("hidden");
@@ -104,6 +111,9 @@ if (GUEST_MODE) {
   if (goSeatmapBtn) goSeatmapBtn.classList.add("hidden");
   const backLink = document.getElementById("sq-back-link");
   if (backLink) backLink.classList.add("hidden");
+}
+if (OPS_MODE) {
+  if (goSeatQueryBtn) goSeatQueryBtn.classList.add("hidden");
 }
 window.addEventListener("hashchange", routeView);
 routeView();
