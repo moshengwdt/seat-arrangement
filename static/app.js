@@ -36,6 +36,13 @@ const sqSubmitBtn = document.getElementById("sq-submit-btn");
 const sqResult = document.getElementById("sq-result");
 const sqStatus = document.getElementById("sq-status");
 
+const authToggle = document.getElementById("auth-toggle");
+const loginForm = document.getElementById("login-form");
+const loginUsername = document.getElementById("login-username");
+const loginPassword = document.getElementById("login-password");
+const loginBtn = document.getElementById("login-btn");
+const loginError = document.getElementById("login-error");
+
 const modal = document.getElementById("modal");
 const modalTitle = document.getElementById("modal-title");
 const modalMessage = document.getElementById("modal-message");
@@ -46,17 +53,56 @@ const modalConfirm = document.getElementById("modal-confirm");
 const originInfo = document.getElementById("origin-info");
 if (originInfo) originInfo.textContent = "页面来源：" + location.origin;
 
-// 角色：guest=游客（仅座位查询）；ops=运营（排座+短信+座位图）；ops-admin 暂未启用
+// 角色：guest=游客（仅座位查询）；ops=运营（排座+短信+座位图）；admin=管理员（预留）
 const ROLE = (window.SEAT_CONFIG && window.SEAT_CONFIG.role)
   || (window.SEAT_CONFIG && window.SEAT_CONFIG.guestMode ? "guest" : "ops");
-const GUEST_MODE = ROLE === "guest";
-const OPS_MODE = ROLE === "ops";
+let CURRENT_ROLE = ROLE;
+let SESSION = null;
+
+function loadSession() {
+  try {
+    const raw = sessionStorage.getItem("seat-session");
+    SESSION = raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    SESSION = null;
+  }
+  return SESSION;
+}
+function saveSession(s) {
+  SESSION = s;
+  try { sessionStorage.setItem("seat-session", JSON.stringify(s)); } catch (e) { /* ignore */ }
+}
+function clearSession() {
+  SESSION = null;
+  try { sessionStorage.removeItem("seat-session"); } catch (e) { /* ignore */ }
+}
+function isGuestRole() { return CURRENT_ROLE === "guest"; }
+function isOpsRole() { return CURRENT_ROLE === "ops" || CURRENT_ROLE === "admin"; }
+function authedUrl(url) {
+  return (SESSION && SESSION.token)
+    ? url + (url.includes("?") ? "&" : "?") + "st=" + encodeURIComponent(SESSION.token)
+    : url;
+}
+function authedFetch(url, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign({}, opts.headers || {});
+  if (SESSION && SESSION.token) opts.headers["X-Seat-Token"] = SESSION.token;
+  return fetch(url, opts);
+}
+function handleAuthFail() {
+  clearSession();
+  CURRENT_ROLE = ROLE;
+  applyRoleUI();
+  location.hash = "#/login";
+  routeView();
+}
 
 // ---------- 视图路由：平台首页 / 排座 / 座位图 / 座位查询 ----------
 const viewHome = document.getElementById("view-home");
 const viewSeat = document.getElementById("view-seat");
 const viewSeatmap = document.getElementById("view-seatmap");
 const viewSeatquery = document.getElementById("view-seatquery");
+const viewLogin = document.getElementById("view-login");
 const goSeatBtn = document.getElementById("go-seat");
 const goSeatmapBtn = document.getElementById("go-seatmap");
 const goSeatQueryBtn = document.getElementById("go-seatquery");
@@ -69,34 +115,61 @@ const smProgressStage = document.getElementById("sm-progress-stage");
 
 function routeView() {
   const h = (location.hash || "#/home").replace(/^#\/?/, "#/");
-  if (OPS_MODE && h === "#/seatquery") {
-    location.hash = "#/home";
-    return;
-  }
-  if (GUEST_MODE) {
+  const authed = !!(SESSION && SESSION.token);
+  if (isGuestRole()) {
     if (viewHome) viewHome.classList.add("hidden");
     if (viewSeat) viewSeat.classList.add("hidden");
     if (viewSeatmap) viewSeatmap.classList.add("hidden");
+    if (viewLogin) viewLogin.classList.add("hidden");
     if (viewSeatquery) viewSeatquery.classList.remove("hidden");
     document.title = "座位查询 · 观光列车智能运营中台";
     if (h === "#/seatquery") loadSeatQuery();
     if (h !== "#/seatquery") location.hash = "#/seatquery";
+    applyRoleUI();
+    return;
+  }
+  // 运营/管理员：未登录先显示登录页
+  if (!authed) {
+    if (viewHome) viewHome.classList.add("hidden");
+    if (viewSeat) viewSeat.classList.add("hidden");
+    if (viewSeatmap) viewSeatmap.classList.add("hidden");
+    if (viewSeatquery) viewSeatquery.classList.add("hidden");
+    if (viewLogin) viewLogin.classList.remove("hidden");
+    document.title = "运营登录 · 观光列车智能运营中台";
+    if (h !== "#/login") location.hash = "#/login";
+    applyRoleUI();
+    return;
+  }
+  if (h === "#/login" || h === "#/seatquery") {
+    location.hash = "#/home";
     return;
   }
   const showSeat = h === "#/seat";
   const showSeatmap = h === "#/seatmap";
-  const showSeatquery = h === "#/seatquery";
-  if (viewHome) viewHome.classList.toggle("hidden", showSeat || showSeatmap || showSeatquery);
+  if (viewHome) viewHome.classList.toggle("hidden", showSeat || showSeatmap);
   if (viewSeat) viewSeat.classList.toggle("hidden", !showSeat);
   if (viewSeatmap) viewSeatmap.classList.toggle("hidden", !showSeatmap);
-  if (viewSeatquery) viewSeatquery.classList.toggle("hidden", !showSeatquery);
+  if (viewSeatquery) viewSeatquery.classList.add("hidden");
+  if (viewLogin) viewLogin.classList.add("hidden");
   document.title = showSeat ? "智能排座 · 观光列车智能运营中台"
     : showSeatmap ? "列车运营情况 · 观光列车智能运营中台"
-    : showSeatquery ? "座位查询 · 观光列车智能运营中台"
     : "观光列车智能运营中台";
   if (showSeatmap) loadSeatMap();
-  if (showSeatquery) loadSeatQuery();
+  applyRoleUI();
 }
+
+function applyRoleUI() {
+  const authed = !!(SESSION && SESSION.token);
+  const guest = isGuestRole();
+  const ops = isOpsRole();
+  if (goSeatBtn) goSeatBtn.classList.toggle("hidden", guest);
+  if (goSeatmapBtn) goSeatmapBtn.classList.toggle("hidden", guest);
+  if (goSeatQueryBtn) goSeatQueryBtn.classList.toggle("hidden", ops);
+  const backLink = document.getElementById("sq-back-link");
+  if (backLink) backLink.classList.toggle("hidden", guest);
+  if (authToggle) authToggle.textContent = authed ? "退出" : "运营登录";
+}
+
 if (goSeatBtn) {
   goSeatBtn.addEventListener("click", () => { location.hash = "#/seat"; });
 }
@@ -106,17 +179,9 @@ if (goSeatmapBtn) {
 if (goSeatQueryBtn) {
   goSeatQueryBtn.addEventListener("click", () => { location.hash = "#/seatquery"; });
 }
-if (GUEST_MODE) {
-  if (goSeatBtn) goSeatBtn.classList.add("hidden");
-  if (goSeatmapBtn) goSeatmapBtn.classList.add("hidden");
-  const backLink = document.getElementById("sq-back-link");
-  if (backLink) backLink.classList.add("hidden");
-}
-if (OPS_MODE) {
-  if (goSeatQueryBtn) goSeatQueryBtn.classList.add("hidden");
-}
 window.addEventListener("hashchange", routeView);
 routeView();
+initSession();
 
 // ---------- 公网发布配置 ----------
 const API_BASE = (window.SEAT_CONFIG && window.SEAT_CONFIG.apiBase) || "";
@@ -275,7 +340,8 @@ function disableLink(link) {
 async function pollJob(job, onProgress) {
   while (true) {
     await sleep(700);
-    const r = await fetch(apiUrl(`/api/job/${job}`));
+    const r = await authedFetch(apiUrl(`/api/job/${job}`));
+    if (r.status === 401) { handleAuthFail(); return null; }
     const st = await r.json();
     if (!st.ok) {
       showError(errorBox, st.error || "查询任务失败");
@@ -343,7 +409,8 @@ async function runSeat() {
   submitBtn.disabled = true;
   submitBtn.textContent = "排座中…";
   try {
-    const resp = await fetch(apiUrl("/api/seat"), { method: "POST", body: fd });
+    const resp = await authedFetch(apiUrl("/api/seat"), { method: "POST", body: fd });
+    if (resp.status === 401) { handleAuthFail(); return; }
     const data = await resp.json();
     if (!data.ok) {
       if (data.error_type === "date") showModal("日期校验", data.error || "日期无效");
@@ -379,7 +446,7 @@ function renderSeatSummary(s) {
     seg.map((x) =>
       `<tr><td>${x.no}</td><td>${escapeHtml(x.pair)}</td><td>${x.seated}</td><td>${x.nouse}</td><td>${x.total}</td></tr>`
     ).join("") + "</tbody>";
-  enableLink(downloadBtn, apiUrl(s.download));
+  enableLink(downloadBtn, authedUrl(apiUrl(s.download)));
   seatProgress.classList.add("hidden");
   seatSummary.classList.remove("hidden");
   smsReadyHint.classList.remove("hidden");
@@ -404,7 +471,8 @@ async function runSms() {
   smsSubmitBtn.disabled = true;
   smsSubmitBtn.textContent = "生成中…";
   try {
-    const resp = await fetch(apiUrl("/api/sms"), { method: "POST", body: fd });
+    const resp = await authedFetch(apiUrl("/api/sms"), { method: "POST", body: fd });
+    if (resp.status === 401) { handleAuthFail(); return; }
     const data = await resp.json();
     if (!data.ok) {
       showError(smsErrorBox, data.error || "生成失败");
@@ -428,9 +496,9 @@ function renderSmsSummary(s) {
   smsMeta.innerHTML =
     `<div><span class="k">短信条数</span><span class="v">${s.sms_count}</span></div>` +
     `<div><span class="k">缺手机号订单</span><span class="v">${s.sms_orders_without_phone}</span></div>`;
-  if (s.sms_download) enableLink(smsDownloadBtn, apiUrl(s.sms_download));
-  if (s.sms_detail_download) enableLink(smsDetailDownloadBtn, apiUrl(s.sms_detail_download));
-  if (s.sms_manifest_download) enableLink(smsManifestDownloadBtn, apiUrl(s.sms_manifest_download));
+  if (s.sms_download) enableLink(smsDownloadBtn, authedUrl(apiUrl(s.sms_download)));
+  if (s.sms_detail_download) enableLink(smsDetailDownloadBtn, authedUrl(apiUrl(s.sms_detail_download)));
+  if (s.sms_manifest_download) enableLink(smsManifestDownloadBtn, authedUrl(apiUrl(s.sms_manifest_download)));
   smsProgress.classList.add("hidden");
   smsSummary.classList.remove("hidden");
 }
@@ -439,7 +507,8 @@ function renderSmsSummary(s) {
 async function pollSendJob(job) {
   while (true) {
     await sleep(700);
-    const r = await fetch(apiUrl(`/api/job/${job}`));
+    const r = await authedFetch(apiUrl(`/api/job/${job}`));
+    if (r.status === 401) { handleAuthFail(); return null; }
     const st = await r.json();
     if (!st.ok) {
       showError(smsSendError, st.error || "查询任务失败");
@@ -464,11 +533,12 @@ async function sendSmsRequest(dryRun) {
   btn.disabled = true;
   btn.textContent = dryRun ? "预览中…" : "发送中…";
   try {
-    const resp = await fetch(apiUrl("/api/sms/send"), {
+    const resp = await authedFetch(apiUrl("/api/sms/send"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mode: smsMode.value, dry_run: dryRun }),
     });
+    if (resp.status === 401) { handleAuthFail(); return; }
     const data = await resp.json();
     if (!data.ok) {
       if (data.error_type === "sms_config") {
@@ -553,9 +623,13 @@ async function loadSeatMap() {
   if (seatmapRoot) seatmapRoot.innerHTML = "";
   try {
     const [layoutsResp, recordsResp] = await Promise.all([
-      fetch(apiUrl("/api/layouts")),
-      fetch(apiUrl("/api/records")),
+      authedFetch(apiUrl("/api/layouts")),
+      authedFetch(apiUrl("/api/records")),
     ]);
+    if (layoutsResp.status === 401 || recordsResp.status === 401) {
+      handleAuthFail();
+      return;
+    }
     seatmapLayouts = (layoutsResp.ok ? (await layoutsResp.json()).layouts : []) || [];
     seatmapRecords = (recordsResp.ok ? (await recordsResp.json()).records : []) || [];
     if (!seatmapLayouts.length) {
@@ -660,7 +734,8 @@ async function showSeatmapSelection(date, route) {
     let summary = record ? (record.summary || {}) : { date: date };
     if (record && record.data_url) {
       smSetProgress(true, 35, "读取排座记录…");
-      const dr = await fetch(apiUrl(record.data_url));
+      const dr = await authedFetch(apiUrl(record.data_url));
+      if (dr.status === 401) { handleAuthFail(); return; }
       if (dr.ok) {
         data = await dr.json();
       } else {
@@ -670,7 +745,8 @@ async function showSeatmapSelection(date, route) {
       showSeatmapMessage("该日期暂无排座记录，请先在「智能排座」完成排座。");
     }
     smSetProgress(true, 65, "加载列车布局…");
-    const layoutResp = await fetch(apiUrl("/api/layout?train=" + encodeURIComponent(base)));
+    const layoutResp = await authedFetch(apiUrl("/api/layout?train=" + encodeURIComponent(base)));
+    if (layoutResp.status === 401) { handleAuthFail(); return; }
     if (!layoutResp.ok) {
       smSetProgress(false);
       showSeatmapMessage("布局加载失败，请稍后重试。");
@@ -1128,7 +1204,7 @@ async function loadSeatQuery() {
   if (sqStatus) sqStatus.textContent = "加载中…";
   try {
     let options = [];
-    if (GUEST_MODE) {
+    if (isGuestRole()) {
       const resp = await fetch(apiUrl("/api/query/options"));
       const d = resp.ok ? await resp.json() : null;
       options = (d && d.ok && Array.isArray(d.trains)) ? d.trains : [];
@@ -1140,8 +1216,8 @@ async function loadSeatQuery() {
       }
     } else {
       const [layoutsResp, recordsResp] = await Promise.all([
-        fetch(apiUrl("/api/layouts")),
-        fetch(apiUrl("/api/records")),
+        authedFetch(apiUrl("/api/layouts")),
+        authedFetch(apiUrl("/api/records")),
       ]);
       sqLayouts = (layoutsResp.ok ? (await layoutsResp.json()).layouts : []) || [];
       sqRecords = (recordsResp.ok ? (await recordsResp.json()).records : []) || [];
@@ -1254,6 +1330,82 @@ if (seatQueryForm) {
     } finally {
       sqSubmitBtn.disabled = false;
       sqSubmitBtn.textContent = "查询座位";
+    }
+  });
+}
+
+// ---------- 登录 / 会话 ----------
+async function initSession() {
+  loadSession();
+  if (SESSION && SESSION.token) {
+    try {
+      const resp = await fetch(apiUrl("/api/me"), { headers: { "X-Seat-Token": SESSION.token } });
+      const d = await resp.json();
+      if (resp.ok && d.ok) {
+        CURRENT_ROLE = d.role;
+        SESSION.role = d.role;
+        saveSession(SESSION);
+      } else {
+        clearSession();
+        CURRENT_ROLE = ROLE;
+      }
+    } catch (e) { /* 离线时保留会话 */ }
+  }
+  applyRoleUI();
+  routeView();
+}
+
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearError(loginError);
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value;
+    if (!username || !password) {
+      showError(loginError, "请输入账号和密码");
+      return;
+    }
+    loginBtn.disabled = true;
+    loginBtn.textContent = "登录中…";
+    try {
+      const resp = await fetch(apiUrl("/api/login"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const d = await resp.json();
+      if (!d.ok) {
+        showError(loginError, d.error || "登录失败");
+        return;
+      }
+      saveSession({ token: d.token, role: d.role, username: d.username, label: d.label });
+      CURRENT_ROLE = d.role;
+      applyRoleUI();
+      location.hash = "#/home";
+      routeView();
+    } catch (err) {
+      showError(loginError, "网络错误：" + err.message);
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "登录";
+    }
+  });
+}
+
+if (authToggle) {
+  authToggle.addEventListener("click", async () => {
+    if (SESSION && SESSION.token) {
+      try {
+        await fetch(apiUrl("/api/logout"), { method: "POST", headers: { "X-Seat-Token": SESSION.token } });
+      } catch (e) { /* ignore */ }
+      clearSession();
+      CURRENT_ROLE = ROLE;
+      applyRoleUI();
+      location.hash = "#/home";
+      routeView();
+    } else {
+      location.hash = "#/login";
+      routeView();
     }
   });
 }

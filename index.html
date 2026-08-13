@@ -15,13 +15,14 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="static/style.css?v=20260813e" />
+  <link rel="stylesheet" href="static/style.css?v=20260813f" />
 </head>
 <body>
   <header class="brand-bar">
     <span class="brand-name">星享铁游游</span>
     <span class="brand-en">yoorail</span>
   </header>
+  <button type="button" class="auth-toggle" id="auth-toggle">运营登录</button>
   <button type="button" class="theme-toggle" id="theme-toggle" aria-label="切换明暗主题">
     <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -254,6 +255,26 @@
     <section id="sq-result" class="hidden" aria-live="polite"></section>
   </main>
 
+  <!-- 运营/管理员登录 -->
+  <main class="container login-view" id="view-login">
+    <h1>运营登录</h1>
+    <p class="hint">运营账号用于排座、短信与座位图；管理员账号预留管理能力。</p>
+    <section class="panel step">
+      <form id="login-form">
+        <label>
+          账号
+          <input type="text" id="login-username" autocomplete="username" required />
+        </label>
+        <label>
+          密码
+          <input type="password" id="login-password" autocomplete="current-password" required />
+        </label>
+        <button type="submit" class="btn" id="login-btn">登录</button>
+        <p id="login-error" class="error hidden"></p>
+      </form>
+    </section>
+  </main>
+
   <!-- 弹窗（提示 / 人工确认） -->
   <div id="modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-box">
@@ -267,7 +288,7 @@
     </div>
   </div>
 
-  <script src="static/config.js?v=20260813e"></script>
-  <script src="static/app.js?v=20260813e"></script>
+  <script src="static/config.js?v=20260813f"></script>
+  <script src="static/app.js?v=20260813f"></script>
 </body>
 </html>

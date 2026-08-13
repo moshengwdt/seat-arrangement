@@ -986,7 +986,9 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 
 /* ---------- 座位查询模块 ---------- */
-.seatquery-view form input[type="text"] {
+.seatquery-view form input[type="text"],
+.login-view form input[type="text"],
+.login-view form input[type="password"] {
   display: block;
   width: 100%;
   min-width: 0;
@@ -1003,7 +1005,9 @@ tbody tr:last-child td { border-bottom: 0; }
   box-sizing: border-box;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
-.seatquery-view form input[type="text"]:focus {
+.seatquery-view form input[type="text"]:focus,
+.login-view form input[type="text"]:focus,
+.login-view form input[type="password"]:focus {
   background: var(--input-bg-focus);
   border-color: var(--accent);
   box-shadow: 0 0 0 4px var(--focus-ring);
@@ -1042,3 +1046,24 @@ tbody tr:last-child td { border-bottom: 0; }
 
 /* ---------- 阿里云短信发送 ---------- */
 .sms-send-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
+
+/* ---------- 登录与角色切换 ---------- */
+.auth-toggle {
+  position: fixed;
+  top: 14px;
+  right: 62px;
+  z-index: 70;
+  padding: 8px 14px;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.auth-toggle:hover {
+  background-color: var(--input-bg-focus);
+  border-color: var(--accent);
+}
